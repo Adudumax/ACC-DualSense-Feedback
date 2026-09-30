@@ -9,7 +9,7 @@
 - [x] All nine accepted telemetry captures replay successfully.
 - [x] Home, controller-error, advanced-settings and diagnostics snapshots render cleanly at the development machine's 150% DPI.
 - [x] The home page was manually checked at 100% DPI; the shared one-line error-state crowding found at both scales was corrected.
-- [ ] All four UI snapshots pass the clean GitHub-hosted 100% DPI job.
+- [x] All four UI snapshots pass the clean GitHub-hosted 100% DPI job ([Release validation #2](https://github.com/Adudumax/ACC-DualSense-Feedback/actions/runs/36728007445)).
 - [x] Portable ZIP contents and SHA-256 manifests are verified.
 - [x] Third-party notices and both required license files are present.
 - [x] Public package contains no developer or personal settings file.
