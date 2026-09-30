@@ -1,0 +1,538 @@
+<Window
+    x:Class="ACCDualSenseFeedback.Ui.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    Title="ACC DualSense"
+    Width="920"
+    Height="580"
+    MinWidth="920"
+    MinHeight="580"
+    MaxWidth="920"
+    MaxHeight="580"
+    Background="Transparent"
+    Icon="/Assets/app.ico"
+    ResizeMode="CanMinimize"
+    ShowInTaskbar="True"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
+    Loaded="Window_Loaded"
+    Closing="Window_Closing"
+    PreviewKeyDown="Window_PreviewKeyDown"
+    SourceInitialized="Window_SourceInitialized">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome
+            CaptionHeight="0"
+            CornerRadius="16"
+            GlassFrameThickness="0"
+            ResizeBorderThickness="0"
+            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Border
+        Background="{DynamicResource Brush.Window}"
+        BorderBrush="{DynamicResource Brush.Border}"
+        BorderThickness="1"
+        CornerRadius="16"
+        ClipToBounds="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="{DynamicResource Brush.Window}" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Margin="26,0,0,0" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Image
+                        Width="24"
+                        Height="24"
+                        Source="/Assets/app-mark.png"
+                        Stretch="Uniform"
+                        RenderOptions.BitmapScalingMode="HighQuality" />
+                    <TextBlock Margin="11,0,0,0" VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold" Text="ACC DualSense" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="0,0,12,0" VerticalAlignment="Center" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button Style="{StaticResource Button.Caption}" Content="−" Click="MinimizeButton_Click" AutomationProperties.Name="Minimize" />
+                    <Button Style="{StaticResource Button.Caption.Close}" Content="×" Click="CloseButton_Click" AutomationProperties.Name="Close" />
+                </StackPanel>
+
+            </Grid>
+
+            <Border Grid.Row="0" Height="1" VerticalAlignment="Bottom" Background="{DynamicResource Brush.Border}" Panel.ZIndex="20" />
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="632" />
+                    <ColumnDefinition Width="288" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Background="{DynamicResource Brush.Canvas}">
+                    <Grid x:Name="LeftPanelContent" Margin="55,36,44,33" Opacity="1">
+                        <Grid.RenderTransform><TranslateTransform x:Name="LeftPanelTranslate" /></Grid.RenderTransform>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Grid x:Name="StatusRow">
+                            <Grid.RenderTransform><TranslateTransform x:Name="StatusTranslate" /></Grid.RenderTransform>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Ellipse x:Name="StatusDot" Width="8" Height="8" Margin="0,0,10,0" VerticalAlignment="Center" Fill="{DynamicResource Brush.Warning}" />
+                            <TextBlock x:Name="StatusStrong" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.StatusStrong}" Text="Starting" />
+                            <TextBlock x:Name="StatusDetail" Grid.Column="2" Margin="11,0,0,0" VerticalAlignment="Center" Style="{StaticResource Type.StatusDetail}" Text="Preparing the controller path." />
+                            <Button x:Name="RetryButton" Grid.Column="3" Margin="12,-5,0,-5" Style="{StaticResource Button.Inline}" Content="Check again" Click="RetryButton_Click" Visibility="Collapsed" />
+                        </Grid>
+
+                        <StackPanel Grid.Row="1" Margin="0,50,0,0" VerticalAlignment="Top">
+                            <TextBlock Style="{StaticResource Type.SectionLabel}" Text="Active preset" />
+
+                            <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
+                                <TextBlock x:Name="ActivePresetName" Style="{StaticResource Type.Display}" Text="Default" />
+                                <TextBlock x:Name="ActivePresetTag" Margin="18,0,0,11" VerticalAlignment="Bottom" Foreground="{DynamicResource Brush.Brand}" FontSize="11.5" FontWeight="Bold" Text="AUTOMATIC" />
+                            </StackPanel>
+
+                            <TextBlock x:Name="ActivePresetDescription" Margin="0,10,0,0" Width="430" HorizontalAlignment="Left" Style="{StaticResource Type.Body}" Text="Balanced vibration and trigger response. Feedback runs automatically while the app is open." />
+
+                            <Grid x:Name="PresetSwitcher" Width="236" Height="50" Margin="0,27,0,0" HorizontalAlignment="Left" Background="{DynamicResource Brush.Surface}" ClipToBounds="True">
+                                <Grid.Clip><RectangleGeometry Rect="0,0,236,50" RadiusX="10" RadiusY="10" /></Grid.Clip>
+                                <Border x:Name="PresetSelection" Width="112" Height="42" Margin="4" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource Brush.TextPrimary}" CornerRadius="8">
+                                    <Border.RenderTransform><TranslateTransform x:Name="PresetSelectionTranslate" /></Border.RenderTransform>
+                                </Border>
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
+                                    <Button x:Name="DefaultPresetButton" Grid.Column="0" Style="{StaticResource Button.Segment}" Click="DefaultPresetButton_Click" AutomationProperties.Name="Default preset">
+                                        <TextBlock x:Name="DefaultPresetLabel" Foreground="White" FontSize="12.5" FontWeight="SemiBold" Text="Default" />
+                                    </Button>
+                                    <Button x:Name="CustomPresetButton" Grid.Column="1" Style="{StaticResource Button.Segment}" Click="CustomPresetButton_Click" AutomationProperties.Name="Custom preset">
+                                        <TextBlock x:Name="CustomPresetLabel" Foreground="{DynamicResource Brush.TextSecondary}" FontSize="12.5" FontWeight="SemiBold" Text="Custom" />
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="ControllerFooterStrong" FontSize="12" FontWeight="SemiBold" Text="DualSense" />
+                                <TextBlock x:Name="ControllerFooterDetail" Margin="5,0,0,0" Style="{StaticResource Type.Caption}" Text="Checking USB" />
+                            </StackPanel>
+                            <StackPanel Margin="38,0,0,0" Orientation="Horizontal">
+                                <TextBlock x:Name="AccFooterStrong" FontSize="12" FontWeight="SemiBold" Text="ACC" />
+                                <TextBlock x:Name="AccFooterDetail" Margin="5,0,0,0" Style="{StaticResource Type.Caption}" Text="Waiting" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid
+                        x:Name="SettingsPanelContent"
+                        Margin="55,31,44,33"
+                        Background="{DynamicResource Brush.Canvas}"
+                        Opacity="0"
+                        Visibility="Collapsed"
+                        Panel.ZIndex="5">
+                        <Grid.RenderTransform><TranslateTransform x:Name="SettingsPanelTranslate" /></Grid.RenderTransform>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Button
+                            Width="72"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource Button.Inline}"
+                            Content="‹  Back"
+                            Click="SettingsBackButton_Click"
+                            AutomationProperties.Name="Back to home" />
+
+                        <StackPanel Grid.Row="1" Margin="0,23,0,0">
+                            <TextBlock
+                                Style="{StaticResource Type.PageTitle}"
+                                Text="Feedback modules" />
+                            <TextBlock
+                                Width="470"
+                                Margin="0,7,0,0"
+                                HorizontalAlignment="Left"
+                                Style="{StaticResource Type.Body}"
+                                Text="Tune each cue independently. Vehicle detection stays automatic." />
+                        </StackPanel>
+
+                        <ScrollViewer
+                            Grid.Row="2"
+                            Margin="0,14,-12,10"
+                            Padding="0,0,12,8"
+                            HorizontalScrollBarVisibility="Disabled"
+                            PanningMode="VerticalOnly"
+                            VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer.Resources>
+                                <Style TargetType="ScrollBar" BasedOn="{StaticResource ScrollBar.Module}" />
+                            </ScrollViewer.Resources>
+                            <StackPanel>
+                                <Grid Height="43">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="01" />
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Pedal resistance" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Resting L2 and R2 force · event pulses stay independent" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Height="50" Background="Transparent" Tag="BrakeResistance" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Brake resistance" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="L2 · base force" />
+                                    </StackPanel>
+                                    <Slider x:Name="BrakeResistanceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Brake trigger base resistance" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="BrakeResistanceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="ThrottleResistance" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Throttle resistance" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 · base force" />
+                                    </StackPanel>
+                                    <Slider x:Name="ThrottleResistanceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Throttle trigger base resistance" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="ThrottleResistanceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+
+                                <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
+                                <Grid Height="43">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="02" />
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Braking cues" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Fast ABS rhythm and heavier wheel-lock warning" />
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Height="50" Background="Transparent" Tag="AbsPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="ABS pulse" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="L2 + grips · intervention" />
+                                    </StackPanel>
+                                    <Slider x:Name="AbsPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="ABS pulse strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="AbsPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="LockPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Wheel lock" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="L2 + grips · ABS off" />
+                                    </StackPanel>
+                                    <Slider x:Name="LockPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Wheel lock pulse strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="LockPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+
+                                <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
+                                <Grid Height="43">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="03" />
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Powertrain" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Subtle engine texture, shift impact and maximum RPM" />
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Height="50" Background="Transparent" Tag="EngineTexture" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Engine texture" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · quiet RPM character" />
+                                    </StackPanel>
+                                    <Slider x:Name="EngineTextureSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Engine texture strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 20." />
+                                    <TextBlock x:Name="EngineTextureValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="20 · Light" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="ShiftKick" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Upshift kick" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 + grips · short impact" />
+                                    </StackPanel>
+                                    <Slider x:Name="ShiftKickSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Upshift impact strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="ShiftKickValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="RedlinePulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Redline pulse" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 · high-RPM warning" />
+                                    </StackPanel>
+                                    <Slider x:Name="RedlinePulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Redline pulse strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="RedlinePulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="RedlineStartPermille" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Pulse begins" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Share of the car's max RPM" />
+                                    </StackPanel>
+                                    <Slider x:Name="RedlineStartSlider" Grid.Column="1" Minimum="940" Maximum="990" SmallChange="1" LargeChange="10" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Redline pulse start RPM percentage" AutomationProperties.HelpText="Right-click to reset to 96.2 percent." />
+                                    <TextBlock x:Name="RedlineStartValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="96.2%" />
+                                </Grid>
+
+                                <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
+                                <Grid Height="43">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="04" />
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Traction" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Separate assisted intervention from raw wheelspin" />
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Height="50" Background="Transparent" Tag="TcPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="TC pulse" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 · intervention" />
+                                    </StackPanel>
+                                    <Slider x:Name="TcPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Traction control pulse strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="TcPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="WheelspinPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Wheelspin warning" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 · TC off" />
+                                    </StackPanel>
+                                    <Slider x:Name="WheelspinPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Wheelspin warning strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="WheelspinPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+
+                                <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
+                                <Grid Height="43">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="05" />
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Surface &amp; grip" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Directional tyre information and ACC's original texture" />
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Height="50" Background="Transparent" Tag="RoadSurface" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Road &amp; kerbs" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · directional impacts" />
+                                    </StackPanel>
+                                    <Slider x:Name="RoadSurfaceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Road and kerb strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="RoadSurfaceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="GripLoss" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Grip loss" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · tyre slip" />
+                                    </StackPanel>
+                                    <Slider x:Name="GripLossSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Tyre grip loss strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="GripLossValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="NativeAcc" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="ACC original vibration" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · native game texture" />
+                                    </StackPanel>
+                                    <Slider x:Name="NativeAccSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Original ACC vibration strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
+                                    <TextBlock x:Name="NativeAccValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="50" Background="Transparent" Tag="CollisionFeedback" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Collision impact" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · short directional hit" />
+                                    </StackPanel>
+                                    <Slider x:Name="CollisionFeedbackSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Collision impact strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 60." />
+                                    <TextBlock x:Name="CollisionFeedbackValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="60 · Standard" />
+                                </Grid>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <TextBlock
+                                x:Name="SettingsPresetStatus"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource Type.Caption}"
+                                Text="0 = Off · Right-click a parameter to reset it." />
+                            <Button
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                Style="{StaticResource Button.Inline}"
+                                Content="Reset all"
+                                Click="ResetFeedbackButton_Click"
+                                AutomationProperties.Name="Reset all feedback modules" />
+                        </Grid>
+                    </Grid>
+
+                    <Grid
+                        x:Name="DiagnosticsPanelContent"
+                        Margin="55,31,44,33"
+                        Background="{DynamicResource Brush.Canvas}"
+                        Opacity="0"
+                        Visibility="Collapsed"
+                        Panel.ZIndex="5">
+                        <Grid.RenderTransform><TranslateTransform x:Name="DiagnosticsPanelTranslate" /></Grid.RenderTransform>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Button
+                            Width="72"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource Button.Inline}"
+                            Content="‹  Back"
+                            Click="DiagnosticsBackButton_Click"
+                            AutomationProperties.Name="Back to home" />
+
+                        <StackPanel Grid.Row="1" Margin="0,23,0,0">
+                            <TextBlock
+                                Style="{StaticResource Type.PageTitle}"
+                                Text="Diagnostics &amp; logs" />
+                            <TextBlock
+                                Width="470"
+                                Margin="0,7,0,0"
+                                HorizontalAlignment="Left"
+                                Style="{StaticResource Type.Body}"
+                                Text="A clear view of the signal path. Nothing is written to disk." />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Margin="0,21,0,0">
+                            <Grid Height="39">
+                                <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center" FontSize="12.5" FontWeight="SemiBold" Text="DualSense" />
+                                <TextBlock x:Name="DiagnosticControllerStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="Waiting" />
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                            <Grid Height="39">
+                                <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center" FontSize="12.5" FontWeight="SemiBold" Text="Virtual controller" />
+                                <TextBlock x:Name="DiagnosticBridgeStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="Waiting" />
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                            <Grid Height="39">
+                                <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center" FontSize="12.5" FontWeight="SemiBold" Text="ACC telemetry" />
+                                <TextBlock x:Name="DiagnosticAccStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="Waiting" />
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                            <Grid Height="39">
+                                <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center" FontSize="12.5" FontWeight="SemiBold" Text="Feedback" />
+                                <TextBlock x:Name="DiagnosticFeedbackStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="Idle" />
+                            </Grid>
+                        </StackPanel>
+
+                        <Grid Grid.Row="3" Margin="0,18,0,0">
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Session log" />
+                                <Button Grid.Column="1" Margin="0,-6,0,0" Style="{StaticResource Button.Inline}" Content="Copy diagnostic report" Click="CopyDiagnosticsButton_Click" AutomationProperties.Name="Copy diagnostic report" />
+                            </Grid>
+                            <TextBlock
+                                x:Name="SessionLogText"
+                                Grid.Row="1"
+                                Margin="0,10,0,0"
+                                VerticalAlignment="Top"
+                                Foreground="{DynamicResource Brush.TextSecondary}"
+                                FontSize="11.5"
+                                LineHeight="19"
+                                Text="No state changes yet."
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Grid.Row="2"
+                                Margin="0,8,0,0"
+                                Foreground="{DynamicResource Brush.TextTertiary}"
+                                FontSize="9.5"
+                                TextWrapping="Wrap">
+                                <Run Text="Adaptive-trigger foundation: Originally created by Hamza Yeşilmen (HamzaYslmn) · " />
+                                <Hyperlink NavigateUri="https://github.com/HamzaYslmn/Forza-Horizon-DualSense-Python" RequestNavigate="ExternalLink_RequestNavigate">Source</Hyperlink>
+                                <Run Text=" · " />
+                                <Hyperlink NavigateUri="https://github.com/sponsors/HamzaYslmn" RequestNavigate="ExternalLink_RequestNavigate">Sponsor</Hyperlink>
+                            </TextBlock>
+                        </Grid>
+                    </Grid>
+
+                    <Border
+                        x:Name="ToastBorder"
+                        MinWidth="270"
+                        MaxWidth="400"
+                        Margin="55,0,0,87"
+                        Padding="14,10,16,11"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        Background="{DynamicResource Brush.TextPrimary}"
+                        CornerRadius="8"
+                        Opacity="0"
+                        Visibility="Collapsed"
+                        Panel.ZIndex="10">
+                        <Border.RenderTransform><TranslateTransform x:Name="ToastTranslate" /></Border.RenderTransform>
+                        <StackPanel>
+                            <TextBlock x:Name="ToastTitle" Foreground="White" FontSize="12" FontWeight="SemiBold" />
+                            <TextBlock x:Name="ToastMessage" Margin="0,3,0,0" Foreground="#FFC7CCD1" FontSize="11.5" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Grid x:Name="RightPanel" Grid.Column="1" Background="{DynamicResource Brush.Window}" ClipToBounds="True">
+                    <Polygon Points="0,305 288,238 288,520 0,520" Fill="{DynamicResource Brush.Brand}" />
+
+                    <Image
+                        x:Name="HeroMark"
+                        Width="178"
+                        Height="178"
+                        Margin="0,52,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Source="/Assets/app-mark.png"
+                        Stretch="Uniform"
+                        RenderOptions.BitmapScalingMode="HighQuality" />
+
+                    <StackPanel Margin="20,0,19,25" VerticalAlignment="Bottom">
+                        <Button x:Name="AdvancedSettingsButton" Style="{StaticResource Button.Navigation}" Click="AdvancedSettingsButton_Click" AutomationProperties.Name="Advanced settings">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock Foreground="White" FontSize="12.5" Text="Advanced settings" />
+                                <TextBlock Grid.Column="1" Foreground="White" FontSize="18" Text="›" />
+                            </Grid>
+                        </Button>
+                        <Border Height="1" Margin="11,0" Background="#35FFFFFF" />
+                        <Button x:Name="DiagnosticsButton" Style="{StaticResource Button.Navigation}" Click="DiagnosticsButton_Click" AutomationProperties.Name="Diagnostics and logs">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock Foreground="White" FontSize="12.5" Text="Diagnostics and logs" />
+                                <TextBlock Grid.Column="1" Foreground="White" FontSize="18" Text="›" />
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
