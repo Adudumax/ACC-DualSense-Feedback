@@ -17,6 +17,7 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <InformationalVersion>1.0.0</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <AssemblyTitle>ACC DualSense Feedback</AssemblyTitle>
     <Product>ACC DualSense Feedback</Product>
     <Description>Low-latency DualSense feedback for Assetto Corsa Competizione.</Description>
