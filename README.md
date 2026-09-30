@@ -56,9 +56,7 @@ Only one ACC DualSense Feedback instance can run at a time. The application reje
 - Directional impact feedback combines damage changes with short-window G-force and local-velocity evidence. It distinguishes front impacts from left/right contact, conserves total impulse energy while panning, adds a bounded continuation texture for damage-producing side scrapes, remains available for discrete impacts when ACC damage is disabled, and rejects the recorded grass/off-track transients.
 - Native-first mixing preserves raw ACC engine, road, chassis and collision detail during ordinary driving. Centered grip events preserve total native energy while centering its arbitrary XInput-channel imbalance; confirmed one-sided events deeply suppress only the conflicting grip and re-route useful transient energy to the telemetry-selected side. A detected impact briefly ducks the background beneath its short crack/thud envelope rather than raising continuous vibration.
 - Stale-telemetry watchdog that clears all generated feedback instead of leaking unlocalized XInput rumble into the left grip.
-- Built-in deterministic self-test and dry-run modes.
 - Optional `--capture-telemetry` CSV mode records every distinct ACC physics packet observed by the app, native ACC motor values and final left/right output. The extended capture includes damage, local motion, four-wheel load, ACC's reserved `Mz/Fx/Fy` slots, wheel speed, brake pressure, suspension and tyre-contact-normal data. Normal operation performs no file I/O.
-- Deterministic `--replay-telemetry <capture.csv>` mode runs a captured drive through the current mixer and writes a frame-by-frame comparison CSV, including a collision-disabled reference, without requiring ACC or a controller.
 - Diagnostic captures include the complete 11-byte state of each adaptive trigger, allowing amplitude, active zones and cadence to be compared instead of checking only the effect mode.
 - Fail-safe shutdown clears both actuators and adaptive triggers after telemetry/output/input-thread faults. A disconnected USB input stream ends the virtual-controller session instead of leaving stale steering or pedal input active.
 - Startup failures for a missing/hidden USB DualSense or unavailable ViGEmBus are reported in the console with actionable checks instead of escaping as an unhandled .NET exception.
@@ -81,13 +79,11 @@ See `RELEASE_NOTES.md` for portable-data details and known release limitations.
 
 ```powershell
 dotnet build .\ACCDualSenseFeedback.sln -c Release
-dotnet .\src\ACCDualSenseFeedback\bin\x64\Release\net8.0-windows\ACCDualSenseFeedback.dll --self-test
 dotnet .\src\ACCDualSenseFeedback\bin\x64\Release\net8.0-windows\ACCDualSenseFeedback.dll --list-devices
 dotnet .\src\ACCDualSenseFeedback\bin\x64\Release\net8.0-windows\ACCDualSenseFeedback.dll --test-feedback
 dotnet .\src\ACCDualSenseFeedback\bin\x64\Release\net8.0-windows\ACCDualSenseFeedback.dll --headless
 dotnet .\src\ACCDualSenseFeedback\bin\x64\Release\net8.0-windows\ACCDualSenseFeedback.dll --dry-run
 dotnet .\src\ACCDualSenseFeedback\bin\x64\Release\net8.0-windows\ACCDualSenseFeedback.dll --capture-telemetry
-dotnet .\src\ACCDualSenseFeedback\bin\x64\Release\net8.0-windows\ACCDualSenseFeedback.dll --replay-telemetry .\ACC-telemetry-example.csv
 
 dotnet publish .\src\ACCDualSenseFeedback\ACCDualSenseFeedback.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o .\dist\win-x64
 ```
@@ -96,7 +92,7 @@ Running without arguments opens the native home screen, connects to ACC shared m
 
 Use `--headless` for the live console dashboard. It prints XInput motor values, gear, RPM, pedals, TC/ABS intervention, per-side tyre dirt, and the active L2/R2 effect modes. `21` means progressive resistance, `26` means an automatic trigger pulse, and `05` means cleared/off because telemetry is stale. Run with `--capture-telemetry` only when calibration data is requested; the CSV is written next to the executable.
 
-For a requested calibration run, double-click `Capture Telemetry.cmd`, record one driving condition, then press Ctrl+C. Each launch writes a separate timestamped `ACC-telemetry-*.csv` beside the executable. Rename that file for the condition before starting the next run, then send back all captures. Separate files are preferred for normal driving, heavy braking, kerbs, front impacts and side impacts.
+For a requested calibration run, launch the executable with `--capture-telemetry`, record one driving condition, then press Ctrl+C. Each launch writes a separate timestamped `ACC-telemetry-*.csv` beside the executable. Rename that file for the condition before starting the next run, then send back all captures. Separate files are preferred for normal driving, heavy braking, kerbs, front impacts and side impacts.
 
 ## Attribution
 

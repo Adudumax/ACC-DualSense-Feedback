@@ -35,11 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\README.md" Link="README.md" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="..\..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="..\..\RELEASE_NOTES.md" Link="RELEASE_NOTES.md" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\docs\PORTABLE-README.txt" Link="README.txt" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\THIRD_PARTY_NOTICES.md" Link="licenses\THIRD_PARTY_NOTICES.md" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\licenses\FORZA-DUALSENSE-LICENSE.txt" Link="licenses\FORZA-DUALSENSE-LICENSE.txt" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\licenses\VIGEM-NET-LICENSE.txt" Link="licenses\VIGEM-NET-LICENSE.txt" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="..\..\Capture Telemetry.cmd" Link="Capture Telemetry.cmd" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

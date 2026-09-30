@@ -36,19 +36,9 @@ public partial class MainWindow : Window
     private string _visualState = string.Empty;
     private readonly Queue<string> _sessionLog = new();
 
-    internal bool IsSnapshotMode { get; set; }
-
-    public MainWindow() : this(snapshotMode: false)
+    public MainWindow()
     {
-    }
-
-    internal MainWindow(bool snapshotMode)
-    {
-        IsSnapshotMode = snapshotMode;
-        bool recovered = false;
-        _profile = snapshotMode
-            ? FeedbackProfile.Default
-            : PortableProfileStore.Load(out recovered);
+        _profile = PortableProfileStore.Load(out bool recovered);
         _profileState = new FeedbackProfileState(_profile);
         _recoveredFromInvalidSettings = recovered;
         InitializeComponent();
@@ -72,9 +62,6 @@ public partial class MainWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        if (IsSnapshotMode)
-            return;
-
         PlayEntranceAnimation();
         _ = StartFeedbackAsync();
         if (_recoveredFromInvalidSettings)
@@ -432,7 +419,7 @@ public partial class MainWindow : Window
 
         _profileSaveCancellation?.Cancel();
 
-        if (!IsSnapshotMode && !PortableProfileStore.TrySave(_profile))
+        if (!PortableProfileStore.TrySave(_profile))
             ShowToast("Change active", "This choice works now, but the app folder did not allow it to be saved.");
     }
 
@@ -518,9 +505,6 @@ public partial class MainWindow : Window
 
     private void ScheduleProfileSave()
     {
-        if (IsSnapshotMode)
-            return;
-
         _profileSaveCancellation?.Cancel();
         _profileSaveCancellation?.Dispose();
         _profileSaveCancellation = new CancellationTokenSource();
@@ -567,21 +551,6 @@ public partial class MainWindow : Window
         UpdateDiagnosticsVisuals();
         await ShowPageAsync(DiagnosticsPanelContent, DiagnosticsPanelTranslate);
     }
-
-    internal void ShowSettingsForSnapshot()
-        => ShowPageForSnapshot(SettingsPanelContent);
-
-    internal void ShowDiagnosticsForSnapshot()
-    {
-        AppendSessionLog("DualSense waiting — connect by USB");
-        UpdateDiagnosticsVisuals();
-        ShowPageForSnapshot(DiagnosticsPanelContent);
-    }
-
-    internal void ShowControllerErrorForSnapshot()
-        => ApplyRuntimeError(new RuntimeDiagnosticException(
-            "DUALSENSE_USB_INPUT_NOT_VISIBLE",
-            "No visible USB DualSense was found."));
 
     private async Task ShowHomeAsync()
         => await ShowPageAsync(LeftPanelContent, LeftPanelTranslate);
@@ -640,12 +609,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ShowPageForSnapshot(Grid target)
-    {
-        CompletePageTransition(target);
-        SetNavigationState(target);
-    }
-
     private void SetNavigationState(Grid page)
     {
         AdvancedSettingsButton.Tag = page == SettingsPanelContent ? "Active" : null;
@@ -697,7 +660,7 @@ public partial class MainWindow : Window
         }
         catch (Exception exception) when (exception is InvalidOperationException or System.ComponentModel.Win32Exception)
         {
-            ShowToast("Could not open the link", "Copy the address from THIRD_PARTY_NOTICES.md instead.");
+            ShowToast("Could not open the link", "See licenses\\THIRD_PARTY_NOTICES.md instead.");
         }
 
         e.Handled = true;
@@ -800,9 +763,6 @@ public partial class MainWindow : Window
 
     private async void Window_Closing(object? sender, CancelEventArgs e)
     {
-        if (IsSnapshotMode)
-            return;
-
         if (_closeCommitted)
             return;
 

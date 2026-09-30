@@ -24,48 +24,20 @@ internal sealed record DiagnosticReportContext(
     DateTimeOffset? LastErrorAt,
     IReadOnlyCollection<string> SessionEvents);
 
-internal sealed record DiagnosticDualSenseProbe(
-    ushort ProductId,
-    string Transport,
-    int InputReportLength,
-    int OutputReportLength);
-
-internal sealed record DiagnosticEnvironmentSnapshot(
-    string ViGEmServiceRegistration,
-    string HidHideServiceRegistration,
-    string HidHideProductVersion,
-    string HidHideCliState,
-    string HidHideCloakingState,
-    string HidHideInverseState,
-    string CurrentExecutableListed,
-    string HiddenDeviceCount,
-    string? DualSenseProbeFailure,
-    IReadOnlyList<DiagnosticDualSenseProbe> DualSenseDevices);
-
 internal static partial class DiagnosticReportBuilder
 {
     private const string ViGEmServiceKey = @"SYSTEM\CurrentControlSet\Services\ViGEmBus";
     private const string HidHideServiceKey = @"SYSTEM\CurrentControlSet\Services\HidHide";
     private const string HidHideProductKey = @"SOFTWARE\Nefarius Software Solutions e.U.\HidHide";
 
-    public static string Build(
-        DiagnosticReportContext context,
-        DiagnosticEnvironmentSnapshot? environmentOverride = null)
+    public static string Build(DiagnosticReportContext context)
     {
         var report = new StringBuilder(4096);
         AppendHeader(report);
         AppendCurrentState(report, context);
         AppendRuntimeStatus(report, context.RuntimeStatus);
-        if (environmentOverride is null)
-        {
-            AppendDriverStatus(report);
-            AppendDualSenseStatus(report);
-        }
-        else
-        {
-            AppendDriverStatus(report, environmentOverride);
-            AppendDualSenseStatus(report, environmentOverride);
-        }
+        AppendDriverStatus(report);
+        AppendDualSenseStatus(report);
         AppendProfile(report, context.Profile);
         AppendException(report, context.LastError, context.LastErrorAt);
         AppendEvents(report, context.SessionEvents);
@@ -144,22 +116,6 @@ internal static partial class DiagnosticReportBuilder
         report.AppendLine($"HidHide hidden-device entries: {probe.HiddenDeviceCount}");
     }
 
-    private static void AppendDriverStatus(
-        StringBuilder report,
-        DiagnosticEnvironmentSnapshot environment)
-    {
-        report.AppendLine();
-        report.AppendLine("[Driver checks]");
-        report.AppendLine($"ViGEmBus service registration: {environment.ViGEmServiceRegistration}");
-        report.AppendLine($"HidHide service registration: {environment.HidHideServiceRegistration}");
-        report.AppendLine($"HidHide product version: {environment.HidHideProductVersion}");
-        report.AppendLine($"HidHide CLI: {environment.HidHideCliState}");
-        report.AppendLine($"HidHide cloaking: {environment.HidHideCloakingState}");
-        report.AppendLine($"HidHide inverse app list: {environment.HidHideInverseState}");
-        report.AppendLine($"This executable listed in HidHide applications: {environment.CurrentExecutableListed}");
-        report.AppendLine($"HidHide hidden-device entries: {environment.HiddenDeviceCount}");
-    }
-
     private static void AppendServiceRegistration(StringBuilder report, string name, string registryPath)
     {
         try
@@ -203,28 +159,6 @@ internal static partial class DiagnosticReportBuilder
         catch (Exception exception)
         {
             report.AppendLine($"Probe failed: {exception.GetType().FullName}; HRESULT=0x{exception.HResult:X8}; {exception.Message}");
-        }
-    }
-
-    private static void AppendDualSenseStatus(
-        StringBuilder report,
-        DiagnosticEnvironmentSnapshot environment)
-    {
-        report.AppendLine();
-        report.AppendLine("[DualSense HID probe]");
-        if (!string.IsNullOrWhiteSpace(environment.DualSenseProbeFailure))
-        {
-            report.AppendLine($"Probe failed: {environment.DualSenseProbeFailure}");
-            return;
-        }
-
-        report.AppendLine($"Visible and openable gamepad interfaces: {environment.DualSenseDevices.Count}");
-        for (int index = 0; index < environment.DualSenseDevices.Count; index++)
-        {
-            DiagnosticDualSenseProbe device = environment.DualSenseDevices[index];
-            report.AppendLine(
-                $"Device {index + 1}: PID=0x{device.ProductId:X4}; transport={device.Transport}; " +
-                $"input report={device.InputReportLength}; output report={device.OutputReportLength}");
         }
     }
 

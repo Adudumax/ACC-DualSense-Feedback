@@ -2,12 +2,9 @@
 
 Initial public release, based on the approved preview12 calibration.
 
-## Release-preflight refinements
+## Interface refinements
 
 - Shortened the home-page recovery guidance so the status, explanation and retry action remain clearly separated at both 100% and 150% Windows scaling.
-- Added a read-only `--environment-report [output.txt]` command for clean-machine and support verification without starting the controller bridge.
-- Added deterministic missing-ViGEmBus, HidHide-blocked and HidHide-whitelisted diagnostic scenarios to the packaged self-test.
-- Added an isolated release-candidate validator and a GitHub-hosted Windows workflow that checks the clean no-driver report, all UI pages at 100% DPI, telemetry replays, package contents and NuGet audit status.
 
 ## Highlights
 

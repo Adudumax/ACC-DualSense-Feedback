@@ -27,51 +27,6 @@ internal static class Program
             // Windows GUI executables do not always inherit a usable console handle.
         }
 
-        int snapshotIndex = Array.FindIndex(
-            args, argument => argument.Equals("--snapshot-ui", StringComparison.OrdinalIgnoreCase));
-        if (snapshotIndex >= 0)
-        {
-            string outputPath = snapshotIndex + 1 < args.Length
-                ? args[snapshotIndex + 1]
-                : Path.Combine(AppContext.BaseDirectory, "ui-snapshot.png");
-            return UiSnapshot.Run(
-                outputPath,
-                showSettings: args.Contains("--settings", StringComparer.OrdinalIgnoreCase),
-                showDiagnostics: args.Contains("--diagnostics", StringComparer.OrdinalIgnoreCase),
-                showControllerError: args.Contains("--controller-error", StringComparer.OrdinalIgnoreCase));
-        }
-
-        int environmentReportIndex = Array.FindIndex(
-            args, argument => argument.Equals("--environment-report", StringComparison.OrdinalIgnoreCase));
-        if (environmentReportIndex >= 0)
-        {
-            string? outputPath = environmentReportIndex + 1 < args.Length &&
-                !args[environmentReportIndex + 1].StartsWith("--", StringComparison.Ordinal)
-                    ? args[environmentReportIndex + 1]
-                    : null;
-            return WriteEnvironmentReport(outputPath);
-        }
-
-        if (args.Contains("--self-test", StringComparer.OrdinalIgnoreCase))
-            return SelfTest.Run();
-
-        int replayIndex = Array.FindIndex(
-            args, argument => argument.Equals("--replay-telemetry", StringComparison.OrdinalIgnoreCase));
-        if (replayIndex >= 0)
-        {
-            if (replayIndex + 1 >= args.Length)
-            {
-                Console.Error.WriteLine("Usage: --replay-telemetry <capture.csv> [--replay-output <output.csv>]");
-                return 1;
-            }
-            int outputIndex = Array.FindIndex(
-                args, argument => argument.Equals("--replay-output", StringComparison.OrdinalIgnoreCase));
-            string? replayOutput = outputIndex >= 0 && outputIndex + 1 < args.Length
-                ? args[outputIndex + 1]
-                : null;
-            return TelemetryReplay.Run(args[replayIndex + 1], replayOutput);
-        }
-
         if (args.Contains("--list-devices", StringComparer.OrdinalIgnoreCase))
             return ListDevices();
 
@@ -155,37 +110,6 @@ internal static class Program
 
         TryConfigureProcess();
         return DesktopApplication.Run();
-    }
-
-    private static int WriteEnvironmentReport(string? outputPath)
-    {
-        string report = DiagnosticReportBuilder.Build(new DiagnosticReportContext(
-            "environment-probe",
-            "Environment probe",
-            "Standalone release-preflight driver and device inspection.",
-            false,
-            false,
-            false,
-            false,
-            null,
-            FeedbackProfile.Default,
-            null,
-            null,
-            Array.Empty<string>()));
-
-        if (string.IsNullOrWhiteSpace(outputPath))
-        {
-            Console.Write(report);
-            return 0;
-        }
-
-        string fullPath = Path.GetFullPath(outputPath);
-        string? directory = Path.GetDirectoryName(fullPath);
-        if (!string.IsNullOrWhiteSpace(directory))
-            Directory.CreateDirectory(directory);
-        File.WriteAllText(fullPath, report, new System.Text.UTF8Encoding(false));
-        Console.WriteLine($"Environment report written to {fullPath}");
-        return 0;
     }
 
     private static int ListDevices()
