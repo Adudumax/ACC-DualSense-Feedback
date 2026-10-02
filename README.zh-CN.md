@@ -34,8 +34,8 @@ USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪�
 
 进入 **[最新 Release](https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest)**，选择一个 Windows x64 ZIP：
 
-- **英文版：** `ACCDualSenseFeedback-v1.0.0-win-x64-portable.zip`
-- **简体中文版：** `ACCDualSenseFeedback-v1.0.0-win-x64-zh-CN-portable.zip`
+- **英文版：** `ACCDualSenseFeedback-v1.0.1-win-x64-portable.zip`
+- **简体中文版：** `ACCDualSenseFeedback-v1.0.1-win-x64-zh-CN-portable.zip`
 
 两个版本使用相同的反馈算法与校准参数。便携包已经包含 .NET 运行时，无需安装应用或另行安装 .NET；中文版也包含所需字体。完整解压后，请保留 EXE 随附的 `licenses` 文件夹。
 

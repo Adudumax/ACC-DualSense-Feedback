@@ -8,7 +8,7 @@
 ./tools/Build-Release.ps1 -Language zh-CN
 ```
 
-默认 `-Language en`，不会将中文字体资源加入英文构建。输出分别为 `dist/release-v1.0.0-zh-CN` 与 `dist/release-v1.0.0`；已存在的发布目录不会覆盖。
+默认 `-Language en`，不会将中文字体资源加入英文构建。输出分别为 `dist/release-v1.0.1-zh-CN` 与 `dist/release-v1.0.1`；已存在的发布目录不会覆盖。
 
 中文包仅包含 EXE、使用说明和四份必要许可/说明：项目 MIT 许可、第三方说明、ViGEm.NET MIT 许可与字体 OFL 许可。字体内嵌在 EXE 中，用户无需安装字体。ZIP 使用标准 ZIP 的最高压缩档，不改变可执行文件内容。
 

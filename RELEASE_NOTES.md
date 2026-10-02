@@ -1,3 +1,17 @@
+# ACC DualSense Feedback 1.0.1
+
+Maintenance release focused on reliable application shutdown.
+
+## Fixed
+
+- Fixed a WPF closing re-entry crash when the feedback runtime had already stopped, including the `DualSense unavailable` state and controller-disconnect errors.
+- Preserved graceful motor, adaptive-trigger and virtual-controller cleanup when closing during an active session.
+- Preserved portable settings before the final window close.
+
+The feedback engine, calibrated defaults and user interface are unchanged from 1.0.0.
+
+---
+
 # ACC DualSense Feedback 1.0.0
 
 Initial public release of ACC DualSense Feedback.

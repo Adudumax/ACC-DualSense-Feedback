@@ -13,10 +13,10 @@
     <TieredCompilation>true</TieredCompilation>
     <AssemblyName>ACCDualSenseFeedback</AssemblyName>
     <RootNamespace>ACCDualSenseFeedback</RootNamespace>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <InformationalVersion>1.0.0</InformationalVersion>
+    <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <InformationalVersion>1.0.1</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <AssemblyTitle>ACC DualSense Feedback</AssemblyTitle>
     <Product>ACC DualSense Feedback</Product>

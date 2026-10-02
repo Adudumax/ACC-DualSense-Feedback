@@ -1,4 +1,4 @@
-ACC DualSense Feedback 1.0.0
+ACC DualSense Feedback 1.0.1
 ================================
 
 A lightweight companion that adds telemetry-driven DualSense feedback to

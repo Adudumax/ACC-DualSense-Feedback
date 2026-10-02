@@ -34,8 +34,8 @@ The app forwards your physical controller through a virtual Xbox 360 controller 
 
 Open **[the latest Release](https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest)** and choose one Windows x64 ZIP:
 
-- **English:** `ACCDualSenseFeedback-v1.0.0-win-x64-portable.zip`
-- **简体中文:** `ACCDualSenseFeedback-v1.0.0-win-x64-zh-CN-portable.zip`
+- **English:** `ACCDualSenseFeedback-v1.0.1-win-x64-portable.zip`
+- **简体中文:** `ACCDualSenseFeedback-v1.0.1-win-x64-zh-CN-portable.zip`
 
 Both editions use the same feedback engine and calibrated defaults. They are self-contained: no installer or separate .NET installation is required. Extract the ZIP and keep the included `licenses` folder beside the EXE.
 

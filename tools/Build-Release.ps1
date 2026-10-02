@@ -1,6 +1,6 @@
 param(
     [ValidatePattern('^\d+\.\d+\.\d+$')]
-    [string]$Version = '1.0.0',
+    [string]$Version = '1.0.1',
 
     [string]$OutputRoot = '',
 
@@ -26,6 +26,7 @@ else {
 $portableName = "ACCDualSenseFeedback-v$Version-win-x64$languageSuffix-portable"
 $portablePath = Join-Path $releaseRoot $portableName
 $zipPath = Join-Path $releaseRoot "$portableName.zip"
+$assemblyVersion = "$Version.0"
 
 if (Test-Path -LiteralPath $releaseRoot) {
     throw "Release output already exists: $releaseRoot. Preserve it or move it before rebuilding."
@@ -41,6 +42,10 @@ New-Item -ItemType Directory -Path $portablePath -Force | Out-Null
     -p:IncludeNativeLibrariesForSelfExtract=true `
     -p:DebugType=None `
     -p:DebugSymbols=false `
+    -p:Version=$Version `
+    -p:AssemblyVersion=$assemblyVersion `
+    -p:FileVersion=$assemblyVersion `
+    -p:InformationalVersion=$Version `
     -p:UiLanguage=$Language `
     -o $portablePath
 if ($LASTEXITCODE -ne 0) {
@@ -73,8 +78,26 @@ foreach ($relativePath in $requiredRelativePaths) {
     }
 }
 
+$portablePrefix = $portablePath.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+$actualRelativePaths = @(
+    Get-ChildItem -LiteralPath $portablePath -Recurse -File |
+        ForEach-Object {
+            if (-not $_.FullName.StartsWith($portablePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw "Published file escaped the portable directory: $($_.FullName)"
+            }
+            $_.FullName.Substring($portablePrefix.Length).Replace('/', '\')
+        } |
+        Sort-Object
+)
+$allowedRelativePaths = @($requiredRelativePaths | Sort-Object)
+$unexpectedPaths = @($actualRelativePaths | Where-Object { $_ -notin $allowedRelativePaths })
+$missingPaths = @($allowedRelativePaths | Where-Object { $_ -notin $actualRelativePaths })
+if ($unexpectedPaths.Count -ne 0 -or $missingPaths.Count -ne 0) {
+    throw "Release content mismatch. Unexpected=[$($unexpectedPaths -join ', ')] Missing=[$($missingPaths -join ', ')]"
+}
+
 $fileVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($executablePath)
-if ($fileVersion.FileVersion -ne '1.0.0.0' -or $fileVersion.ProductVersion -ne $Version) {
+if ($fileVersion.FileVersion -ne $assemblyVersion -or $fileVersion.ProductVersion -ne $Version) {
     throw "Unexpected executable version: file=$($fileVersion.FileVersion), product=$($fileVersion.ProductVersion)"
 }
 

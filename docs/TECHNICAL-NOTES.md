@@ -12,7 +12,7 @@ Clarifications for the archived text: the GUI exposes startup recovery and diagn
 
 Low-latency, telemetry-driven DualSense feedback for Assetto Corsa Competizione.
 
-Current release: **1.0.0**, based on the approved preview12 calibration.
+Current release: **1.0.1**, based on the approved preview12 calibration with a shutdown reliability fix.
 
 ## Requirements
 

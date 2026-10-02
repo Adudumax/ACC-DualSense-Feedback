@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using ACCDualSenseFeedback.Diagnostics;
 using ACCDualSenseFeedback.Haptics;
 using ACCDualSenseFeedback.Runtime;
@@ -773,7 +774,7 @@ public partial class MainWindow : Window
 
     private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
 
-    private async void Window_Closing(object? sender, CancelEventArgs e)
+    private void Window_Closing(object? sender, CancelEventArgs e)
     {
         if (_closeCommitted)
             return;
@@ -783,18 +784,36 @@ public partial class MainWindow : Window
             return;
 
         _closing = true;
-        _toastCancellation?.Cancel();
-        _profileSaveCancellation?.Cancel();
-        _runCancellation?.Cancel();
-        if (_runtimeTask is not null)
-            await Task.WhenAny(_runtimeTask, Task.Delay(2000));
+        _ = Dispatcher.BeginInvoke(
+            DispatcherPriority.Background,
+            new Action(() => _ = CompleteClosingAsync()));
+    }
 
-        _ = PortableProfileStore.TrySave(_profile);
-        _toastCancellation?.Dispose();
-        _profileSaveCancellation?.Dispose();
-        _runCancellation?.Dispose();
-        _closeCommitted = true;
-        Close();
+    private async Task CompleteClosingAsync()
+    {
+        try
+        {
+            _toastCancellation?.Cancel();
+            _profileSaveCancellation?.Cancel();
+            _runCancellation?.Cancel();
+
+            Task? runtimeTask = _runtimeTask;
+            if (runtimeTask is not null)
+                await Task.WhenAny(runtimeTask, Task.Delay(2000));
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine($"Shutdown cleanup failed: {exception}");
+        }
+        finally
+        {
+            _ = PortableProfileStore.TrySave(_profile);
+            _toastCancellation?.Dispose();
+            _profileSaveCancellation?.Dispose();
+            _runCancellation?.Dispose();
+            _closeCommitted = true;
+            Close();
+        }
     }
 
     [DllImport("dwmapi.dll")]
