@@ -17,6 +17,8 @@ A lightweight Windows companion that gives **Assetto Corsa Competizione** richer
 
 Connect your controller by USB, open the app, and drive. Feedback starts automatically when the DualSense and ACC are ready. Close the app to stop feedback and release the virtual controller; minimizing keeps it running.
 
+![Ready when you are — automatic feedback with calibrated Default and Custom presets.](docs/assets/github/readme-showcase/home-ready-en.png)
+
 ## ✨ What you can feel
 
 | Feedback | In your hands |
@@ -46,7 +48,7 @@ Both editions use the same feedback engine and calibrated defaults. They are sel
 - DualSense or DualSense Edge connected by **USB**. Bluetooth is not supported.
 - **ViGEmBus** virtual-controller driver: [download the official release](https://github.com/nefarius/ViGEmBus/releases).
 - Steam Input **disabled for ACC**.
-- DS4Windows **fully closed** while this app is running.
+- If you use DS4Windows, keep it **fully closed** while this app is running.
 
 Install **ViGEmBus**, not ViGEm.NET. The ViGEm.NET client is already included in the app. If ViGEmBus is already installed and working—for example from an earlier DS4Windows setup—you do not need to reinstall it.
 
@@ -56,7 +58,7 @@ Install **ViGEmBus**, not ViGEm.NET. The ViGEm.NET client is already included in
 
 1. Download the ZIP and **extract it completely to a writable folder**. Do not run the EXE from inside the archive.
 2. Install ViGEmBus if needed, then restart Windows if its installer asks you to.
-3. Connect the DualSense by USB and fully exit DS4Windows.
+3. Connect the DualSense by USB. If you use DS4Windows, fully exit it first.
 4. Disable Steam Input in ACC's Steam controller settings.
 5. If you use HidHide, allow this EXE as described above.
 6. Open `ACCDualSenseFeedback.exe`, start ACC, and enter a driving session.
@@ -69,6 +71,8 @@ The home screen shows the connection state. Once everything is ready, feedback s
 ## 🎛️ Default or Custom
 
 Start with **Default** for the calibrated experience. Choose **Custom** or open **Advanced settings** when you want to tune individual cues:
+
+![Make it your feel — fine-tune each cue from 0 to 100 and reset parameters individually.](docs/assets/github/readme-showcase/custom-modules-en.png)
 
 - **Pedal resistance:** brake and throttle base resistance.
 - **Braking:** ABS pulse and wheel-lock warning.
@@ -108,5 +112,3 @@ See **[Release notes](RELEASE_NOTES.md)** for the current version's highlights, 
 ACC DualSense Feedback is open source under the **[MIT License](LICENSE)**. Bundled third-party components and the Chinese UI font retain their own licenses; see **[Third-party notices](THIRD_PARTY_NOTICES.md)** and the texts included in each portable package.
 
 Thanks to Nefarius for ViGEmBus / ViGEm.NET, the ACC shared-memory community references, and the Noto Sans SC project used by the Chinese interface.
-
-This is an independent companion app and is not affiliated with or endorsed by Kunos Simulazioni or Sony Interactive Entertainment.
