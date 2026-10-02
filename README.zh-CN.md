@@ -1,10 +1,10 @@
 ![ACC DualSense Feedback. The car, in your hands.](docs/assets/github/readme-banner.png)
 
 <p align="center">
-  <a href="https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest"><img src="https://img.shields.io/github/v/release/Adudumax/ACC-DualSense-Feedback?display_name=tag&style=flat-square&color=E91D2D" alt="最新版本"></a>
+  <a href="https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest"><img src="https://img.shields.io/github/v/release/Adudumax/ACC-DualSense-Feedback?display_name=tag&style=flat-square&logo=github&label=release&color=ED1B2F" alt="最新版本"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20%C2%B7%20x64-171B21?style=flat-square&logo=windows11&logoColor=white" alt="Windows 10 或 11，x64">
-  <img src="https://img.shields.io/badge/portable-no%20install-3D4652?style=flat-square" alt="便携版，无需安装">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-68717D?style=flat-square" alt="许可证：MIT"></a>
+  <img src="https://img.shields.io/badge/portable-no%20install-4F5964?style=flat-square" alt="便携版，无需安装">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Adudumax/ACC-DualSense-Feedback?style=flat-square&color=68717D" alt="许可证：MIT"></a>
 </p>
 
 <p align="center"><a href="README.md">English</a> · 简体中文</p>
