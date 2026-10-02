@@ -17,6 +17,8 @@
 
 USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪后，反馈会自动运行。关闭应用即可停止反馈并释放虚拟手柄；最小化不会停止运行。
 
+![随时就绪——自动反馈，并提供经过校准的默认与自定义预设。](docs/assets/github/readme-showcase/home-ready-en.png)
+
 ## ✨ 你能感受到什么
 
 | 反馈 | 手中的变化 |
@@ -46,7 +48,7 @@ USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪�
 - 通过 **USB** 连接的 DualSense 或 DualSense Edge；暂不支持蓝牙。
 - **ViGEmBus** 虚拟手柄驱动：[官方下载页](https://github.com/nefarius/ViGEmBus/releases)。
 - 为 ACC **禁用 Steam Input**。
-- 运行本应用时**完全退出 DS4Windows**。
+- 如果你使用 DS4Windows，运行本应用时请**完全退出**。
 
 需要安装的是 **ViGEmBus**，不是 ViGEm.NET；ViGEm.NET 客户端已经包含在应用中。如果电脑中已有正常工作的 ViGEmBus，例如以前使用 DS4Windows 时已经安装，就不必重复安装。
 
@@ -56,7 +58,7 @@ USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪�
 
 1. 下载 ZIP，**完整解压到可写入的文件夹**；不要直接在压缩包内运行 EXE。
 2. 按需安装 ViGEmBus；如果安装程序要求重启，请先重启 Windows。
-3. 用 USB 连接 DualSense，并完全退出 DS4Windows。
+3. 用 USB 连接 DualSense；如果你使用 DS4Windows，请先完全退出。
 4. 在 Steam 的 ACC 控制器设置中禁用 Steam Input。
 5. 如果使用 HidHide，按上文允许本应用访问手柄。
 6. 打开 `ACCDualSenseFeedback.exe`，启动 ACC 并进入驾驶。
@@ -69,6 +71,8 @@ USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪�
 ## 🎛️ 默认或自定义
 
 建议先使用校准好的**默认预设**。需要调整时选择**自定义**或进入**高级设置**：
+
+![定制你的手感——每项反馈可在 0 到 100 之间细调，并可单独恢复默认值。](docs/assets/github/readme-showcase/custom-modules-en.png)
 
 - **踏板阻力：** 刹车与油门的基础扳机阻力。
 - **制动：** ABS 脉冲与车轮锁死提示。
@@ -108,5 +112,3 @@ USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪�
 ACC DualSense Feedback 采用 **[MIT 许可证](LICENSE)** 开源。随应用分发的第三方组件与中文字体保留各自许可，详见 **[第三方声明](THIRD_PARTY_NOTICES.md)** 以及便携包内的许可全文。
 
 感谢 Nefarius 的 ViGEmBus / ViGEm.NET、ACC 共享内存社区参考资料，以及中文版界面使用的 Noto Sans SC 项目。
-
-本项目是独立伴随工具，与 Kunos Simulazioni 或 Sony Interactive Entertainment 不存在隶属或官方认可关系。
