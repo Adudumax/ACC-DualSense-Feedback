@@ -41,7 +41,7 @@ internal static partial class DiagnosticReportBuilder
         AppendProfile(report, context.Profile);
         AppendException(report, context.LastError, context.LastErrorAt);
         AppendEvents(report, context.SessionEvents);
-        return report.ToString();
+        return DiagnosticPrivacy.Redact(report.ToString());
     }
 
     private static void AppendHeader(StringBuilder report)

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -232,6 +233,8 @@ public partial class MainWindow : Window
 
     private void ApplyState(string key, string status, string detail, Brush accent, bool showRetry = false)
     {
+        status = UiText.Get(status);
+        detail = UiText.Get(detail);
         bool changed = _visualState != key;
 
         void Update()
@@ -273,9 +276,9 @@ public partial class MainWindow : Window
         _accConnected = acc;
         _feedbackLive = feedback;
 
-        ControllerFooterDetail.Text = controller ? "USB" : "Waiting";
+        ControllerFooterDetail.Text = UiText.Get(controller ? "USB" : "Waiting");
         ControllerFooterDetail.Foreground = FindBrush(controller ? "Brush.TextSecondary" : "Brush.TextTertiary");
-        AccFooterDetail.Text = feedback ? "Telemetry live" : acc ? "Game detected" : "Waiting";
+        AccFooterDetail.Text = feedback ? UiText.Get("Telemetry live") : acc ? UiText.Get("Game detected") : UiText.WaitingForAcc;
         AccFooterDetail.Foreground = FindBrush(feedback ? "Brush.TextSecondary" : "Brush.TextTertiary");
         UpdateDiagnosticsVisuals();
     }
@@ -386,13 +389,13 @@ public partial class MainWindow : Window
         e.Handled = true;
         if (reset.Updated == _profile)
         {
-            ShowToast("Already at default", $"{reset.Label} is already {reset.DefaultText}.");
+            ShowToast("Already at default", UiText.Format("{0} is already {1}.", UiText.Get(reset.Label), reset.DefaultText));
             return;
         }
 
         ApplyCustomProfileChange(reset.Updated);
         SyncFeedbackSliders();
-        ShowToast("Parameter reset", $"{reset.Label} is back to {reset.DefaultText}.");
+        ShowToast("Parameter reset", UiText.Format("{0} is back to {1}.", UiText.Get(reset.Label), reset.DefaultText));
     }
 
     private void ApplyCustomProfileChange(FeedbackProfile profile)
@@ -454,11 +457,11 @@ public partial class MainWindow : Window
     private void ApplyHomeProfileVisuals(bool animate)
     {
         bool custom = _profile.ActivePreset == FeedbackPreset.Custom;
-        ActivePresetName.Text = custom ? "Custom" : "Default";
-        ActivePresetTag.Text = custom ? "PERSONAL" : "AUTOMATIC";
-        ActivePresetDescription.Text = custom
+        ActivePresetName.Text = UiText.Get(custom ? "Custom" : "Default");
+        ActivePresetTag.Text = UiText.Get(custom ? "PERSONAL" : "AUTOMATIC");
+        ActivePresetDescription.Text = UiText.Get(custom
             ? "Your saved feel. Feedback still runs automatically while the app is open."
-            : "Balanced vibration and trigger response. Feedback runs automatically while the app is open.";
+            : "Balanced vibration and trigger response. Feedback runs automatically while the app is open.");
 
         MoveSelection(PresetSelectionTranslate, custom ? 114 : 0, animate);
         DefaultPresetLabel.Foreground = FindBrush(custom ? "Brush.TextSecondary" : "Brush.Window");
@@ -491,17 +494,25 @@ public partial class MainWindow : Window
         readout.Opacity = 1;
         readout.Text = value > 0
             ? $"{value} · {DescribeStrength(value)}"
-            : "0 · Off";
+            : UiText.Get("0 · Off");
+#if ZH_CN
+        readout.Inlines.Clear();
+        readout.Inlines.Add(new Run($"{value} · ") { FontFamily = UiTypography.LatinFont });
+        readout.Inlines.Add(new Run(value > 0 ? DescribeStrength(value) : "关闭")
+        {
+            FontFamily = UiTypography.TextFont
+        });
+#endif
     }
 
-    private static string DescribeStrength(int value) => value switch
+    private static string DescribeStrength(int value) => UiText.Get(value switch
     {
         <= 20 => "Light",
         <= 40 => "Soft",
         <= 60 => "Standard",
         <= 80 => "Strong",
         _ => "Intense"
-    };
+    });
 
     private void ScheduleProfileSave()
     {
@@ -617,6 +628,7 @@ public partial class MainWindow : Window
 
     private void AppendSessionLog(string message)
     {
+        message = UiText.Get(message);
         _sessionLog.Enqueue($"{DateTime.Now:HH:mm:ss}  {message}");
         while (_sessionLog.Count > 100)
             _sessionLog.Dequeue();
@@ -626,10 +638,10 @@ public partial class MainWindow : Window
 
     private void UpdateDiagnosticsVisuals()
     {
-        DiagnosticControllerStatus.Text = _controllerConnected ? "Connected · USB" : "Waiting";
-        DiagnosticBridgeStatus.Text = _virtualControllerActive ? "Active" : "Waiting";
-        DiagnosticAccStatus.Text = _feedbackLive ? "Telemetry live" : _accConnected ? "Game detected" : "Waiting";
-        DiagnosticFeedbackStatus.Text = _feedbackLive ? "Active" : "Idle";
+        DiagnosticControllerStatus.Text = UiText.Get(_controllerConnected ? "Connected · USB" : "Waiting");
+        DiagnosticBridgeStatus.Text = UiText.Get(_virtualControllerActive ? "Active" : "Waiting");
+        DiagnosticAccStatus.Text = _feedbackLive ? UiText.Get("Telemetry live") : _accConnected ? UiText.Get("Game detected") : UiText.WaitingForAcc;
+        DiagnosticFeedbackStatus.Text = UiText.Get(_feedbackLive ? "Active" : "Idle");
 
         DiagnosticControllerStatus.Foreground = FindBrush(_controllerConnected ? "Brush.TextSecondary" : "Brush.TextTertiary");
         DiagnosticBridgeStatus.Foreground = FindBrush(_virtualControllerActive ? "Brush.TextSecondary" : "Brush.TextTertiary");
@@ -694,8 +706,8 @@ public partial class MainWindow : Window
         _toastCancellation = new CancellationTokenSource();
         CancellationToken cancellationToken = _toastCancellation.Token;
 
-        ToastTitle.Text = title;
-        ToastMessage.Text = message;
+        ToastTitle.Text = UiText.Get(title);
+        ToastMessage.Text = UiText.Get(message);
         ToastBorder.Visibility = Visibility.Visible;
 
         if (SystemParameters.ClientAreaAnimation)

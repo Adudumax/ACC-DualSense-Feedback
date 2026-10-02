@@ -1,6 +1,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="clr-namespace:ACCDualSenseFeedback.Ui"
     xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework">
 
     <Color x:Key="Color.Window">#FFF7F8F9</Color>
@@ -11,7 +12,7 @@
     <Color x:Key="Color.BorderStrong">#FFB7BEC5</Color>
     <Color x:Key="Color.TextPrimary">#FF0A0B0D</Color>
     <Color x:Key="Color.TextSecondary">#FF59626B</Color>
-    <Color x:Key="Color.TextTertiary">#FF7A838C</Color>
+    <x:Static x:Key="Color.TextTertiary" Member="ui:UiTypography.CaptionColor" />
     <Color x:Key="Color.Brand">#FFE32232</Color>
     <Color x:Key="Color.BrandHover">#FFCA1828</Color>
     <Color x:Key="Color.Success">#FF51D486</Color>
@@ -31,52 +32,59 @@
     <SolidColorBrush x:Key="Brush.Success" Color="{StaticResource Color.Success}" />
     <SolidColorBrush x:Key="Brush.Warning" Color="{StaticResource Color.Warning}" />
 
-    <FontFamily x:Key="Font.Text">Segoe UI Variable Text, Segoe UI</FontFamily>
-    <FontFamily x:Key="Font.Display">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <x:Static x:Key="Font.Text" Member="ui:UiTypography.TextFont" />
+    <x:Static x:Key="Font.Display" Member="ui:UiTypography.DisplayFont" />
+    <x:Static x:Key="Font.Latin" Member="ui:UiTypography.LatinFont" />
 
     <Style TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource Font.Text}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
         <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
-        <Setter Property="TextOptions.TextRenderingMode" Value="Grayscale" />
+        <Setter Property="TextOptions.TextRenderingMode" Value="{x:Static ui:UiTypography.RenderingMode}" />
     </Style>
 
     <Style x:Key="Type.StatusStrong" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="12.5" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="{x:Static ui:UiTypography.StatusSize}" />
+        <Setter Property="FontWeight" Value="{x:Static ui:UiTypography.StatusWeight}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
     </Style>
 
     <Style x:Key="Type.StatusDetail" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="{x:Static ui:UiTypography.StatusSize}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}" />
     </Style>
 
     <Style x:Key="Type.SectionLabel" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource Font.Display}" />
-        <Setter Property="FontSize" Value="18" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="{x:Static ui:UiTypography.SectionLabelSize}" />
+        <Setter Property="FontWeight" Value="{x:Static ui:UiTypography.SectionLabelWeight}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}" />
     </Style>
 
     <Style x:Key="Type.Display" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource Font.Display}" />
-        <Setter Property="FontSize" Value="68" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="LineHeight" Value="72" />
+        <Setter Property="FontSize" Value="{x:Static ui:UiTypography.DisplaySize}" />
+        <Setter Property="FontWeight" Value="{x:Static ui:UiTypography.DisplayWeight}" />
+        <Setter Property="LineHeight" Value="{x:Static ui:UiTypography.DisplayLineHeight}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
     </Style>
 
     <Style x:Key="Type.Body" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14.5" />
-        <Setter Property="LineHeight" Value="21" />
+        <Setter Property="FontSize" Value="{x:Static ui:UiTypography.BodySize}" />
+        <Setter Property="LineHeight" Value="{x:Static ui:UiTypography.BodyLineHeight}" />
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}" />
     </Style>
 
     <Style x:Key="Type.Caption" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="FontSize" Value="{x:Static ui:UiTypography.CaptionSize}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextTertiary}" />
+    </Style>
+
+    <Style x:Key="Type.ParameterReadout" TargetType="TextBlock" BasedOn="{StaticResource Type.Caption}">
+        <Setter Property="FontFamily" Value="{StaticResource Font.Latin}" />
+        <Setter Property="FontSize" Value="{x:Static ui:UiTypography.ValueSize}" />
+        <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
     </Style>
 
     <Style
@@ -84,8 +92,9 @@
         TargetType="TextBlock"
         BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="FontFamily" Value="{StaticResource Font.Text}" />
-        <Setter Property="FontSize" Value="36" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="{x:Static ui:UiTypography.PageTitleSize}" />
+        <Setter Property="FontWeight" Value="{x:Static ui:UiTypography.PageTitleWeight}" />
+        <Setter Property="LineHeight" Value="{x:Static ui:UiTypography.PageTitleLineHeight}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
         <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
         <Setter Property="TextOptions.TextRenderingMode" Value="Auto" />
@@ -229,6 +238,7 @@
         <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Text}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -339,6 +349,7 @@
 
     <Style x:Key="Slider.Compact" TargetType="Slider" BasedOn="{StaticResource Slider.Feel}">
         <Setter Property="Height" Value="36" />
+        <Setter Property="Margin" Value="{x:Static ui:UiTypography.SliderMargin}" />
     </Style>
 
     <Style x:Key="ScrollBar.ModuleButton" TargetType="RepeatButton">

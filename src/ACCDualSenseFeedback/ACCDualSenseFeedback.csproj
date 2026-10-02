@@ -20,10 +20,23 @@
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <AssemblyTitle>ACC DualSense Feedback</AssemblyTitle>
     <Product>ACC DualSense Feedback</Product>
+    <Authors>Adudumax</Authors>
+    <Copyright>Copyright (c) 2026 Adudumax</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Low-latency DualSense feedback for Assetto Corsa Competizione.</Description>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <StartupObject>ACCDualSenseFeedback.Program</StartupObject>
+    <UiLanguage Condition="'$(UiLanguage)' == ''">en</UiLanguage>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UiLanguage)' == 'zh-CN'">
+    <DefineConstants>$(DefineConstants);ZH_CN</DefineConstants>
+    <Description>用于 Assetto Corsa Competizione 的低延迟 DualSense 震动与扳机反馈。</Description>
+  </PropertyGroup>
+
+  <Target Name="ValidateUiLanguage" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(UiLanguage)' != 'en' and '$(UiLanguage)' != 'zh-CN'" Text="UiLanguage must be en or zh-CN." />
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="Nefarius.ViGEm.Client" Version="1.21.256" />
@@ -34,10 +47,16 @@
     <Resource Include="Assets\app.ico" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(UiLanguage)' == 'zh-CN'">
+    <Resource Include="Assets\Fonts\*.ttf" />
+    <Content Include="..\..\licenses\NOTO-SANS-SC-OFL.txt" Link="licenses\NOTO-SANS-SC-OFL.txt" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
-    <Content Include="..\..\docs\PORTABLE-README.txt" Link="README.txt" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\LICENSE" Link="licenses\ACC-DUALSENSE-FEEDBACK-LICENSE.txt" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\docs\PORTABLE-README.txt" Link="README.txt" CopyToPublishDirectory="PreserveNewest" Condition="'$(UiLanguage)' == 'en'" />
+    <Content Include="..\..\docs\PORTABLE-README.zh-CN.txt" Link="使用说明.txt" CopyToPublishDirectory="PreserveNewest" Condition="'$(UiLanguage)' == 'zh-CN'" />
     <Content Include="..\..\THIRD_PARTY_NOTICES.md" Link="licenses\THIRD_PARTY_NOTICES.md" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="..\..\licenses\FORZA-DUALSENSE-LICENSE.txt" Link="licenses\FORZA-DUALSENSE-LICENSE.txt" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\licenses\VIGEM-NET-LICENSE.txt" Link="licenses\VIGEM-NET-LICENSE.txt" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

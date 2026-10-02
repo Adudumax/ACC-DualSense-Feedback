@@ -3,7 +3,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:ui="clr-namespace:ACCDualSenseFeedback.Ui"
     Title="ACC DualSense"
+    FontFamily="{x:Static ui:UiTypography.TextFont}"
+    Language="{x:Static ui:UiTypography.Language}"
     Width="920"
     Height="580"
     MinWidth="920"
@@ -11,7 +14,7 @@
     MaxWidth="920"
     MaxHeight="580"
     Background="Transparent"
-    Icon="/Assets/app.ico"
+    Icon="/ACCDualSenseFeedback;component/Assets/app.ico"
     ResizeMode="CanMinimize"
     ShowInTaskbar="True"
     SnapsToDevicePixels="True"
@@ -54,15 +57,15 @@
                     <Image
                         Width="24"
                         Height="24"
-                        Source="/Assets/app-mark.png"
+                        Source="/ACCDualSenseFeedback;component/Assets/app-mark.png"
                         Stretch="Uniform"
                         RenderOptions.BitmapScalingMode="HighQuality" />
-                    <TextBlock Margin="11,0,0,0" VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold" Text="ACC DualSense" />
+                    <TextBlock Margin="11,0,0,0" VerticalAlignment="Center" FontFamily="{StaticResource Font.Latin}" FontSize="13" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;ACC DualSense&quot;}" />
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Margin="0,0,12,0" VerticalAlignment="Center" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button Style="{StaticResource Button.Caption}" Content="−" Click="MinimizeButton_Click" AutomationProperties.Name="Minimize" />
-                    <Button Style="{StaticResource Button.Caption.Close}" Content="×" Click="CloseButton_Click" AutomationProperties.Name="Close" />
+                    <Button Style="{StaticResource Button.Caption}" Content="−" Click="MinimizeButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Minimize&quot;}" />
+                    <Button Style="{StaticResource Button.Caption.Close}" Content="×" Click="CloseButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Close&quot;}" />
                 </StackPanel>
 
             </Grid>
@@ -93,20 +96,20 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Ellipse x:Name="StatusDot" Width="8" Height="8" Margin="0,0,10,0" VerticalAlignment="Center" Fill="{DynamicResource Brush.Warning}" />
-                            <TextBlock x:Name="StatusStrong" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.StatusStrong}" Text="Starting" />
-                            <TextBlock x:Name="StatusDetail" Grid.Column="2" Margin="11,0,0,0" VerticalAlignment="Center" Style="{StaticResource Type.StatusDetail}" Text="Preparing the controller path." />
-                            <Button x:Name="RetryButton" Grid.Column="3" Margin="12,-5,0,-5" Style="{StaticResource Button.Inline}" Content="Check again" Click="RetryButton_Click" Visibility="Collapsed" />
+                            <TextBlock x:Name="StatusStrong" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.StatusStrong}" Text="{ui:Translate Text=&quot;Starting&quot;}" />
+                            <TextBlock x:Name="StatusDetail" Grid.Column="2" Margin="11,0,0,0" VerticalAlignment="Center" Style="{StaticResource Type.StatusDetail}" Text="{ui:Translate Text=&quot;Preparing the controller path.&quot;}" />
+                            <Button x:Name="RetryButton" Grid.Column="3" Margin="12,-5,0,-5" Style="{StaticResource Button.Inline}" Content="{ui:Translate Text=&quot;Check again&quot;}" Click="RetryButton_Click" Visibility="Collapsed" />
                         </Grid>
 
                         <StackPanel Grid.Row="1" Margin="0,50,0,0" VerticalAlignment="Top">
-                            <TextBlock Style="{StaticResource Type.SectionLabel}" Text="Active preset" />
+                            <TextBlock Style="{StaticResource Type.SectionLabel}" Text="{ui:Translate Text=&quot;Active preset&quot;}" />
 
                             <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
-                                <TextBlock x:Name="ActivePresetName" Style="{StaticResource Type.Display}" Text="Default" />
-                                <TextBlock x:Name="ActivePresetTag" Margin="18,0,0,11" VerticalAlignment="Bottom" Foreground="{DynamicResource Brush.Brand}" FontSize="11.5" FontWeight="Bold" Text="AUTOMATIC" />
+                                <TextBlock x:Name="ActivePresetName" Style="{StaticResource Type.Display}" Text="{ui:Translate Text=&quot;Default&quot;}" />
+                                <TextBlock x:Name="ActivePresetTag" Margin="18,0,0,11" VerticalAlignment="Bottom" Foreground="{DynamicResource Brush.Brand}" FontSize="{x:Static ui:UiTypography.TagSize}" FontWeight="{x:Static ui:UiTypography.TagWeight}" Text="{ui:Translate Text=&quot;AUTOMATIC&quot;}" />
                             </StackPanel>
 
-                            <TextBlock x:Name="ActivePresetDescription" Margin="0,10,0,0" Width="430" HorizontalAlignment="Left" Style="{StaticResource Type.Body}" Text="Balanced vibration and trigger response. Feedback runs automatically while the app is open." />
+                            <TextBlock x:Name="ActivePresetDescription" Margin="0,10,0,0" Width="430" HorizontalAlignment="Left" Style="{StaticResource Type.Body}" Text="{ui:Translate Text=&quot;Balanced vibration and trigger response. Feedback runs automatically while the app is open.&quot;}" />
 
                             <Grid x:Name="PresetSwitcher" Width="236" Height="50" Margin="0,27,0,0" HorizontalAlignment="Left" Background="{DynamicResource Brush.Surface}" ClipToBounds="True">
                                 <Grid.Clip><RectangleGeometry Rect="0,0,236,50" RadiusX="10" RadiusY="10" /></Grid.Clip>
@@ -115,11 +118,11 @@
                                 </Border>
                                 <Grid Margin="4">
                                     <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
-                                    <Button x:Name="DefaultPresetButton" Grid.Column="0" Style="{StaticResource Button.Segment}" Click="DefaultPresetButton_Click" AutomationProperties.Name="Default preset">
-                                        <TextBlock x:Name="DefaultPresetLabel" Foreground="White" FontSize="12.5" FontWeight="SemiBold" Text="Default" />
+                                    <Button x:Name="DefaultPresetButton" Grid.Column="0" Style="{StaticResource Button.Segment}" Click="DefaultPresetButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Default preset&quot;}">
+                                        <TextBlock x:Name="DefaultPresetLabel" Foreground="White" FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{x:Static ui:UiText.DefaultSegment}" />
                                     </Button>
-                                    <Button x:Name="CustomPresetButton" Grid.Column="1" Style="{StaticResource Button.Segment}" Click="CustomPresetButton_Click" AutomationProperties.Name="Custom preset">
-                                        <TextBlock x:Name="CustomPresetLabel" Foreground="{DynamicResource Brush.TextSecondary}" FontSize="12.5" FontWeight="SemiBold" Text="Custom" />
+                                    <Button x:Name="CustomPresetButton" Grid.Column="1" Style="{StaticResource Button.Segment}" Click="CustomPresetButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Custom preset&quot;}">
+                                        <TextBlock x:Name="CustomPresetLabel" Foreground="{DynamicResource Brush.TextSecondary}" FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{x:Static ui:UiText.CustomSegment}" />
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -127,12 +130,12 @@
 
                         <StackPanel Grid.Row="2" Orientation="Horizontal">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock x:Name="ControllerFooterStrong" FontSize="12" FontWeight="SemiBold" Text="DualSense" />
-                                <TextBlock x:Name="ControllerFooterDetail" Margin="5,0,0,0" Style="{StaticResource Type.Caption}" Text="Checking USB" />
+                                <TextBlock x:Name="ControllerFooterStrong" FontFamily="{StaticResource Font.Latin}" FontSize="12" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;DualSense&quot;}" />
+                                <TextBlock x:Name="ControllerFooterDetail" Margin="5,0,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Checking USB&quot;}" />
                             </StackPanel>
                             <StackPanel Margin="38,0,0,0" Orientation="Horizontal">
-                                <TextBlock x:Name="AccFooterStrong" FontSize="12" FontWeight="SemiBold" Text="ACC" />
-                                <TextBlock x:Name="AccFooterDetail" Margin="5,0,0,0" Style="{StaticResource Type.Caption}" Text="Waiting" />
+                                <TextBlock x:Name="AccFooterStrong" FontFamily="{StaticResource Font.Latin}" FontSize="12" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;ACC&quot;}" />
+                                <TextBlock x:Name="AccFooterDetail" Margin="5,0,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Waiting&quot;}" />
                             </StackPanel>
                         </StackPanel>
                     </Grid>
@@ -156,20 +159,20 @@
                             Width="72"
                             HorizontalAlignment="Left"
                             Style="{StaticResource Button.Inline}"
-                            Content="‹  Back"
+                            Content="{ui:Translate Text=&quot;‹  Back&quot;}"
                             Click="SettingsBackButton_Click"
-                            AutomationProperties.Name="Back to home" />
+                            AutomationProperties.Name="{ui:Translate Text=&quot;Back to home&quot;}" />
 
                         <StackPanel Grid.Row="1" Margin="0,23,0,0">
                             <TextBlock
                                 Style="{StaticResource Type.PageTitle}"
-                                Text="Feedback modules" />
+                                Text="{ui:Translate Text=&quot;Feedback modules&quot;}" />
                             <TextBlock
                                 Width="470"
                                 Margin="0,7,0,0"
                                 HorizontalAlignment="Left"
                                 Style="{StaticResource Type.Body}"
-                                Text="Tune each cue independently. Vehicle detection stays automatic." />
+                                Text="{ui:Translate Text=&quot;Tune each cue independently. Vehicle detection stays automatic.&quot;}" />
                         </StackPanel>
 
                         <ScrollViewer
@@ -183,189 +186,189 @@
                                 <Style TargetType="ScrollBar" BasedOn="{StaticResource ScrollBar.Module}" />
                             </ScrollViewer.Resources>
                             <StackPanel>
-                                <Grid Height="43">
+                                <Grid Height="{x:Static ui:UiTypography.ModuleHeaderHeight}">
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="01" />
+                                    <TextBlock VerticalAlignment="Top" FontFamily="{StaticResource Font.Latin}" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="01" />
                                     <StackPanel Grid.Column="1">
-                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Pedal resistance" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Resting L2 and R2 force · event pulses stay independent" />
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Pedal resistance&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Resting L2 and R2 force · event pulses stay independent&quot;}" />
                                     </StackPanel>
                                 </Grid>
 
-                                <Grid Height="50" Background="Transparent" Tag="BrakeResistance" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="BrakeResistance" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Brake resistance" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="L2 · base force" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Brake resistance&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;L2 · base force&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="BrakeResistanceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Brake trigger base resistance" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="BrakeResistanceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                    <Slider x:Name="BrakeResistanceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Brake trigger base resistance&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="BrakeResistanceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
                                 </Grid>
                                 <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="ThrottleResistance" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="ThrottleResistance" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Throttle resistance" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 · base force" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Throttle resistance&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;R2 · base force&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="ThrottleResistanceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Throttle trigger base resistance" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="ThrottleResistanceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
-                                </Grid>
-
-                                <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
-                                <Grid Height="43">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="02" />
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Braking cues" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Fast ABS rhythm and heavier wheel-lock warning" />
-                                    </StackPanel>
-                                </Grid>
-                                <Grid Height="50" Background="Transparent" Tag="AbsPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="ABS pulse" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="L2 + grips · intervention" />
-                                    </StackPanel>
-                                    <Slider x:Name="AbsPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="ABS pulse strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="AbsPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
-                                </Grid>
-                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="LockPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Wheel lock" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="L2 + grips · ABS off" />
-                                    </StackPanel>
-                                    <Slider x:Name="LockPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Wheel lock pulse strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="LockPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                    <Slider x:Name="ThrottleResistanceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Throttle trigger base resistance&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="ThrottleResistanceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
                                 </Grid>
 
                                 <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
-                                <Grid Height="43">
+                                <Grid Height="{x:Static ui:UiTypography.ModuleHeaderHeight}">
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="03" />
+                                    <TextBlock VerticalAlignment="Top" FontFamily="{StaticResource Font.Latin}" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="02" />
                                     <StackPanel Grid.Column="1">
-                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Powertrain" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Subtle engine texture, shift impact and maximum RPM" />
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Braking cues&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Fast ABS rhythm and heavier wheel-lock warning&quot;}" />
                                     </StackPanel>
                                 </Grid>
-                                <Grid Height="50" Background="Transparent" Tag="EngineTexture" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="AbsPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Engine texture" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · quiet RPM character" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;ABS pulse&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;L2 + grips · intervention&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="EngineTextureSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Engine texture strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 20." />
-                                    <TextBlock x:Name="EngineTextureValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="20 · Light" />
-                                </Grid>
-                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="ShiftKick" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Upshift kick" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 + grips · short impact" />
-                                    </StackPanel>
-                                    <Slider x:Name="ShiftKickSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Upshift impact strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="ShiftKickValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                    <Slider x:Name="AbsPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;ABS pulse strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="AbsPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
                                 </Grid>
                                 <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="RedlinePulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="LockPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Redline pulse" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 · high-RPM warning" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Wheel lock&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;L2 + grips · ABS off&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="RedlinePulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Redline pulse strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="RedlinePulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
-                                </Grid>
-                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="RedlineStartPermille" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Pulse begins" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Share of the car's max RPM" />
-                                    </StackPanel>
-                                    <Slider x:Name="RedlineStartSlider" Grid.Column="1" Minimum="940" Maximum="990" SmallChange="1" LargeChange="10" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Redline pulse start RPM percentage" AutomationProperties.HelpText="Right-click to reset to 96.2 percent." />
-                                    <TextBlock x:Name="RedlineStartValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="96.2%" />
+                                    <Slider x:Name="LockPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Wheel lock pulse strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="LockPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
                                 </Grid>
 
                                 <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
-                                <Grid Height="43">
+                                <Grid Height="{x:Static ui:UiTypography.ModuleHeaderHeight}">
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="04" />
+                                    <TextBlock VerticalAlignment="Top" FontFamily="{StaticResource Font.Latin}" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="03" />
                                     <StackPanel Grid.Column="1">
-                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Traction" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Separate assisted intervention from raw wheelspin" />
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Powertrain&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Subtle engine texture, shift impact and maximum RPM&quot;}" />
                                     </StackPanel>
                                 </Grid>
-                                <Grid Height="50" Background="Transparent" Tag="TcPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="EngineTexture" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="TC pulse" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 · intervention" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Engine texture&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Grips · quiet RPM character&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="TcPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Traction control pulse strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="TcPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                    <Slider x:Name="EngineTextureSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Engine texture strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 20.&quot;}" />
+                                    <TextBlock x:Name="EngineTextureValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;20 · Light&quot;}" />
                                 </Grid>
                                 <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="WheelspinPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="ShiftKick" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Wheelspin warning" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="R2 · TC off" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Upshift kick&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;R2 + grips · short impact&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="WheelspinPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Wheelspin warning strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="WheelspinPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                    <Slider x:Name="ShiftKickSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Upshift impact strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="ShiftKickValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="RedlinePulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Redline pulse&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;R2 · high-RPM warning&quot;}" />
+                                    </StackPanel>
+                                    <Slider x:Name="RedlinePulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Redline pulse strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="RedlinePulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="RedlineStartPermille" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Pulse begins&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Share of the car's max RPM&quot;}" />
+                                    </StackPanel>
+                                    <Slider x:Name="RedlineStartSlider" Grid.Column="1" Minimum="940" Maximum="990" SmallChange="1" LargeChange="10" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Redline pulse start RPM percentage&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Right-click to reset to 96.2 percent.&quot;}" />
+                                    <TextBlock x:Name="RedlineStartValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="96.2%" />
                                 </Grid>
 
                                 <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
-                                <Grid Height="43">
+                                <Grid Height="{x:Static ui:UiTypography.ModuleHeaderHeight}">
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Top" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="05" />
+                                    <TextBlock VerticalAlignment="Top" FontFamily="{StaticResource Font.Latin}" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="04" />
                                     <StackPanel Grid.Column="1">
-                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Surface &amp; grip" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Directional tyre information and ACC's original texture" />
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Traction&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Separate assisted intervention from raw wheelspin&quot;}" />
                                     </StackPanel>
                                 </Grid>
-                                <Grid Height="50" Background="Transparent" Tag="RoadSurface" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="TcPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Road &amp; kerbs" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · directional impacts" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;TC pulse&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;R2 · intervention&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="RoadSurfaceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Road and kerb strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="RoadSurfaceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
-                                </Grid>
-                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="GripLoss" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Grip loss" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · tyre slip" />
-                                    </StackPanel>
-                                    <Slider x:Name="GripLossSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Tyre grip loss strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="GripLossValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                    <Slider x:Name="TcPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Traction control pulse strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="TcPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
                                 </Grid>
                                 <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="NativeAcc" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="WheelspinPulse" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="ACC original vibration" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · native game texture" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Wheelspin warning&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;R2 · TC off&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="NativeAccSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Original ACC vibration strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 50." />
-                                    <TextBlock x:Name="NativeAccValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="50 · Standard" />
+                                    <Slider x:Name="WheelspinPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Wheelspin warning strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="WheelspinPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
+                                </Grid>
+
+                                <Border Height="1" Margin="0,15,0,16" Background="{DynamicResource Brush.BorderStrong}" />
+                                <Grid Height="{x:Static ui:UiTypography.ModuleHeaderHeight}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /></Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Top" FontFamily="{StaticResource Font.Latin}" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="05" />
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Surface &amp; grip&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Directional tyre information and ACC's original texture&quot;}" />
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="RoadSurface" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Road &amp; kerbs&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Grips · directional impacts&quot;}" />
+                                    </StackPanel>
+                                    <Slider x:Name="RoadSurfaceSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Road and kerb strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="RoadSurfaceValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
                                 </Grid>
                                 <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="50" Background="Transparent" Tag="CollisionFeedback" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="178" /><ColumnDefinition /><ColumnDefinition Width="88" /></Grid.ColumnDefinitions>
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="GripLoss" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Collision impact" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="Grips · short directional hit" />
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Grip loss&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Grips · tyre slip&quot;}" />
                                     </StackPanel>
-                                    <Slider x:Name="CollisionFeedbackSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="Collision impact strength" AutomationProperties.HelpText="Set to zero to turn off. Right-click to reset to 60." />
-                                    <TextBlock x:Name="CollisionFeedbackValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="60 · Standard" />
+                                    <Slider x:Name="GripLossSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Tyre grip loss strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="GripLossValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="NativeAcc" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;ACC original vibration&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Grips · native game texture&quot;}" />
+                                    </StackPanel>
+                                    <Slider x:Name="NativeAccSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Original ACC vibration strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
+                                    <TextBlock x:Name="NativeAccValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
+                                </Grid>
+                                <Border Height="1" Background="{DynamicResource Brush.Border}" />
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="CollisionFeedback" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Collision impact&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Grips · short directional hit&quot;}" />
+                                    </StackPanel>
+                                    <Slider x:Name="CollisionFeedbackSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Collision impact strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 60.&quot;}" />
+                                    <TextBlock x:Name="CollisionFeedbackValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;60 · Standard&quot;}" />
                                 </Grid>
                             </StackPanel>
                         </ScrollViewer>
@@ -376,14 +379,14 @@
                                 x:Name="SettingsPresetStatus"
                                 VerticalAlignment="Center"
                                 Style="{StaticResource Type.Caption}"
-                                Text="0 = Off · Right-click a parameter to reset it." />
+                                Text="{ui:Translate Text=&quot;0 = Off · Right-click a parameter to reset it.&quot;}" />
                             <Button
                                 Grid.Column="1"
                                 Margin="10,0,0,0"
                                 Style="{StaticResource Button.Inline}"
-                                Content="Reset all"
+                                Content="{ui:Translate Text=&quot;Reset all&quot;}"
                                 Click="ResetFeedbackButton_Click"
-                                AutomationProperties.Name="Reset all feedback modules" />
+                                AutomationProperties.Name="{ui:Translate Text=&quot;Reset all feedback modules&quot;}" />
                         </Grid>
                     </Grid>
 
@@ -406,45 +409,45 @@
                             Width="72"
                             HorizontalAlignment="Left"
                             Style="{StaticResource Button.Inline}"
-                            Content="‹  Back"
+                            Content="{ui:Translate Text=&quot;‹  Back&quot;}"
                             Click="DiagnosticsBackButton_Click"
-                            AutomationProperties.Name="Back to home" />
+                            AutomationProperties.Name="{ui:Translate Text=&quot;Back to home&quot;}" />
 
                         <StackPanel Grid.Row="1" Margin="0,23,0,0">
                             <TextBlock
                                 Style="{StaticResource Type.PageTitle}"
-                                Text="Diagnostics &amp; logs" />
+                                Text="{ui:Translate Text=&quot;Diagnostics &amp; logs&quot;}" />
                             <TextBlock
                                 Width="470"
                                 Margin="0,7,0,0"
                                 HorizontalAlignment="Left"
                                 Style="{StaticResource Type.Body}"
-                                Text="A clear view of the signal path. Nothing is written to disk." />
+                                Text="{ui:Translate Text=&quot;A clear view of the signal path. Nothing is written to disk.&quot;}" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="2" Margin="0,21,0,0">
                             <Grid Height="39">
                                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center" FontSize="12.5" FontWeight="SemiBold" Text="DualSense" />
-                                <TextBlock x:Name="DiagnosticControllerStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="Waiting" />
+                                <TextBlock VerticalAlignment="Center" FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;DualSense&quot;}" />
+                                <TextBlock x:Name="DiagnosticControllerStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Waiting&quot;}" />
                             </Grid>
                             <Border Height="1" Background="{DynamicResource Brush.Border}" />
                             <Grid Height="39">
                                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center" FontSize="12.5" FontWeight="SemiBold" Text="Virtual controller" />
-                                <TextBlock x:Name="DiagnosticBridgeStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="Waiting" />
+                                <TextBlock VerticalAlignment="Center" FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Virtual controller&quot;}" />
+                                <TextBlock x:Name="DiagnosticBridgeStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Waiting&quot;}" />
                             </Grid>
                             <Border Height="1" Background="{DynamicResource Brush.Border}" />
                             <Grid Height="39">
                                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center" FontSize="12.5" FontWeight="SemiBold" Text="ACC telemetry" />
-                                <TextBlock x:Name="DiagnosticAccStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="Waiting" />
+                                <TextBlock VerticalAlignment="Center" FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;ACC telemetry&quot;}" />
+                                <TextBlock x:Name="DiagnosticAccStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Waiting&quot;}" />
                             </Grid>
                             <Border Height="1" Background="{DynamicResource Brush.Border}" />
                             <Grid Height="39">
                                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center" FontSize="12.5" FontWeight="SemiBold" Text="Feedback" />
-                                <TextBlock x:Name="DiagnosticFeedbackStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="Idle" />
+                                <TextBlock VerticalAlignment="Center" FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Feedback&quot;}" />
+                                <TextBlock x:Name="DiagnosticFeedbackStatus" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Idle&quot;}" />
                             </Grid>
                         </StackPanel>
 
@@ -452,8 +455,8 @@
                             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock FontSize="12.5" FontWeight="SemiBold" Text="Session log" />
-                                <Button Grid.Column="1" Margin="0,-6,0,0" Style="{StaticResource Button.Inline}" Content="Copy diagnostic report" Click="CopyDiagnosticsButton_Click" AutomationProperties.Name="Copy diagnostic report" />
+                                <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Session log&quot;}" />
+                                <Button Grid.Column="1" Margin="0,-6,0,0" Style="{StaticResource Button.Inline}" Content="{ui:Translate Text=&quot;Copy diagnostic report&quot;}" Click="CopyDiagnosticsButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Copy diagnostic report&quot;}" />
                             </Grid>
                             <TextBlock
                                 x:Name="SessionLogText"
@@ -463,7 +466,7 @@
                                 Foreground="{DynamicResource Brush.TextSecondary}"
                                 FontSize="11.5"
                                 LineHeight="19"
-                                Text="No state changes yet."
+                                Text="{ui:Translate Text=&quot;No state changes yet.&quot;}"
                                 TextWrapping="Wrap" />
                             <TextBlock
                                 Grid.Row="2"
@@ -471,10 +474,8 @@
                                 Foreground="{DynamicResource Brush.TextTertiary}"
                                 FontSize="9.5"
                                 TextWrapping="Wrap">
-                                <Run Text="Adaptive-trigger foundation: Originally created by Hamza Yeşilmen (HamzaYslmn) · " />
-                                <Hyperlink NavigateUri="https://github.com/HamzaYslmn/Forza-Horizon-DualSense-Python" RequestNavigate="ExternalLink_RequestNavigate">Source</Hyperlink>
-                                <Run Text=" · " />
-                                <Hyperlink NavigateUri="https://github.com/sponsors/HamzaYslmn" RequestNavigate="ExternalLink_RequestNavigate">Sponsor</Hyperlink>
+                                <Run Text="{ui:Translate Text=&quot;Thanks to HamzaYslmn for the DualSense technical reference · &quot;}" />
+                                <Hyperlink NavigateUri="https://github.com/HamzaYslmn/Forza-Horizon-DualSense-Python" RequestNavigate="ExternalLink_RequestNavigate"><Run Text="{ui:Translate Text=&quot;Source&quot;}" /></Hyperlink>
                             </TextBlock>
                         </Grid>
                     </Grid>
@@ -510,23 +511,23 @@
                         Margin="0,52,0,0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
-                        Source="/Assets/app-mark.png"
+                        Source="/ACCDualSenseFeedback;component/Assets/app-mark.png"
                         Stretch="Uniform"
                         RenderOptions.BitmapScalingMode="HighQuality" />
 
                     <StackPanel Margin="20,0,19,25" VerticalAlignment="Bottom">
-                        <Button x:Name="AdvancedSettingsButton" Style="{StaticResource Button.Navigation}" Click="AdvancedSettingsButton_Click" AutomationProperties.Name="Advanced settings">
+                        <Button x:Name="AdvancedSettingsButton" Style="{StaticResource Button.Navigation}" Click="AdvancedSettingsButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Advanced settings&quot;}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Foreground="White" FontSize="12.5" Text="Advanced settings" />
+                                <TextBlock Foreground="White" FontSize="12.5" Text="{ui:Translate Text=&quot;Advanced settings&quot;}" />
                                 <TextBlock Grid.Column="1" Foreground="White" FontSize="18" Text="›" />
                             </Grid>
                         </Button>
                         <Border Height="1" Margin="11,0" Background="#35FFFFFF" />
-                        <Button x:Name="DiagnosticsButton" Style="{StaticResource Button.Navigation}" Click="DiagnosticsButton_Click" AutomationProperties.Name="Diagnostics and logs">
+                        <Button x:Name="DiagnosticsButton" Style="{StaticResource Button.Navigation}" Click="DiagnosticsButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Diagnostics and logs&quot;}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Foreground="White" FontSize="12.5" Text="Diagnostics and logs" />
+                                <TextBlock Foreground="White" FontSize="12.5" Text="{ui:Translate Text=&quot;Diagnostics and logs&quot;}" />
                                 <TextBlock Grid.Column="1" Foreground="White" FontSize="18" Text="›" />
                             </Grid>
                         </Button>

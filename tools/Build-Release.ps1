@@ -2,15 +2,20 @@ param(
     [ValidatePattern('^\d+\.\d+\.\d+$')]
     [string]$Version = '1.0.0',
 
-    [string]$OutputRoot = ''
+    [string]$OutputRoot = '',
+
+    [ValidateSet('en', 'zh-CN')]
+    [string]$Language = 'en'
 )
 
 $ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $projectPath = Join-Path $repositoryRoot 'src\ACCDualSenseFeedback\ACCDualSenseFeedback.csproj'
+$languageSuffix = if ($Language -eq 'zh-CN') { '-zh-CN' } else { '' }
 $releaseRoot = if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-    Join-Path $repositoryRoot "dist\release-v$Version"
+    Join-Path $repositoryRoot "dist\release-v$Version$languageSuffix"
 }
 elseif ([System.IO.Path]::IsPathRooted($OutputRoot)) {
     [System.IO.Path]::GetFullPath($OutputRoot)
@@ -18,7 +23,7 @@ elseif ([System.IO.Path]::IsPathRooted($OutputRoot)) {
 else {
     [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $OutputRoot))
 }
-$portableName = "ACCDualSenseFeedback-v$Version-win-x64-portable"
+$portableName = "ACCDualSenseFeedback-v$Version-win-x64$languageSuffix-portable"
 $portablePath = Join-Path $releaseRoot $portableName
 $zipPath = Join-Path $releaseRoot "$portableName.zip"
 
@@ -36,6 +41,7 @@ New-Item -ItemType Directory -Path $portablePath -Force | Out-Null
     -p:IncludeNativeLibrariesForSelfExtract=true `
     -p:DebugType=None `
     -p:DebugSymbols=false `
+    -p:UiLanguage=$Language `
     -o $portablePath
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet publish failed with exit code $LASTEXITCODE."
@@ -48,11 +54,18 @@ if (-not (Test-Path -LiteralPath $executablePath -PathType Leaf)) {
 
 $requiredRelativePaths = @(
     'ACCDualSenseFeedback.exe',
-    'README.txt',
+    'licenses\ACC-DUALSENSE-FEEDBACK-LICENSE.txt',
     'licenses\THIRD_PARTY_NOTICES.md',
-    'licenses\FORZA-DUALSENSE-LICENSE.txt',
     'licenses\VIGEM-NET-LICENSE.txt'
 )
+$requiredRelativePaths += if ($Language -eq 'zh-CN') {
+    $chineseReadmeName = (-join @(
+        [char]0x4F7F, [char]0x7528, [char]0x8BF4, [char]0x660E
+    )) + '.txt'
+    $chineseReadmeName, 'licenses\NOTO-SANS-SC-OFL.txt'
+} else {
+    'README.txt'
+}
 foreach ($relativePath in $requiredRelativePaths) {
     $requiredPath = Join-Path $portablePath $relativePath
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
@@ -65,7 +78,18 @@ if ($fileVersion.FileVersion -ne '1.0.0.0' -or $fileVersion.ProductVersion -ne $
     throw "Unexpected executable version: file=$($fileVersion.FileVersion), product=$($fileVersion.ProductVersion)"
 }
 
-Compress-Archive -LiteralPath $portablePath -DestinationPath $zipPath -CompressionLevel Optimal
+$compressionLevel = if ([Enum]::GetNames([System.IO.Compression.CompressionLevel]) -contains 'SmallestSize') {
+    [Enum]::Parse([System.IO.Compression.CompressionLevel], 'SmallestSize')
+}
+else {
+    [System.IO.Compression.CompressionLevel]::Optimal
+}
+
+[System.IO.Compression.ZipFile]::CreateFromDirectory(
+    $portablePath,
+    $zipPath,
+    $compressionLevel,
+    $true)
 
 $releaseManifestPath = Join-Path $releaseRoot 'SHA256SUMS.txt'
 $releaseManifest = @(
@@ -77,3 +101,4 @@ $releaseManifest = @(
 Write-Host "Release prepared: $releaseRoot"
 Write-Host "Portable ZIP: $zipPath"
 Write-Host "Executable version: $($fileVersion.ProductVersion)"
+Write-Host "UI language: $Language"

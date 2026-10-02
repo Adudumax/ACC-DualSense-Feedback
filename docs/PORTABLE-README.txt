@@ -39,7 +39,7 @@ TROUBLESHOOTING
 
 Open Diagnostics and logs inside the app and select Copy diagnostic report when
 requesting support. The report includes driver and runtime information without
-including the private HID device path.
+including private HID device paths or user-profile directories in error messages.
 
 The executable is currently unsigned, so Windows SmartScreen may show an
 unknown-publisher warning.
@@ -48,4 +48,5 @@ SUPPORT AND RELEASES
 
 https://github.com/Adudumax/ACC-DualSense-Feedback
 
-Third-party notices and required license texts are in the licenses folder.
+This project's code is licensed under the MIT License. The project license,
+third-party notices and required license texts are in the licenses folder.

@@ -101,7 +101,7 @@ internal static class Program
         if (!isFirstInstance)
         {
             System.Windows.MessageBox.Show(
-                "ACC DualSense Feedback is already running.",
+                UiText.Get("ACC DualSense Feedback is already running."),
                 "ACC DualSense",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Information);

@@ -1,10 +1,6 @@
 # ACC DualSense Feedback 1.0.0
 
-Initial public release, based on the approved preview12 calibration.
-
-## Interface refinements
-
-- Shortened the home-page recovery guidance so the status, explanation and retry action remain clearly separated at both 100% and 150% Windows scaling.
+Initial public release of ACC DualSense Feedback.
 
 ## Highlights
 
@@ -15,7 +11,9 @@ Initial public release, based on the approved preview12 calibration.
 - Progressive adaptive-trigger resistance with independently adjustable modules.
 - Default and Custom presets, per-parameter right-click reset, and portable settings.
 - In-app diagnostics with a privacy-safe report that can be copied for support.
+- Copied reports redact user-profile directories and private HID device paths in error messages while retaining error codes and call stacks.
 - No telemetry or diagnostic files are written during normal operation.
+- Refined status layout remains readable at both 100% and 150% Windows scaling.
 
 ## Requirements
 
@@ -39,6 +37,8 @@ The first launch uses the built-in Default preset. After a user changes a parame
 - ACC retains several shared-memory compatibility fields that are not populated by the game. Their absence is handled by tested fallbacks and does not indicate a controller fault.
 - Only one instance of the application can run at a time.
 
-## Attribution
+## Credits and third-party licenses
 
-Adaptive-trigger implementation work was informed by the project identified in `THIRD_PARTY_NOTICES.md`. The required attribution, source link, sponsor link and complete license are included with this distribution and exposed from the Diagnostics & logs page.
+The project's own code is distributed under the MIT License. Its full text is included in the portable package's `licenses` folder.
+
+Third-party license texts for the bundled ViGEm.NET client and, in the Chinese build, the Noto Sans SC font are included with this distribution.
