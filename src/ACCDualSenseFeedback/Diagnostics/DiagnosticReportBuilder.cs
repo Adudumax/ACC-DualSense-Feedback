@@ -90,7 +90,7 @@ internal static partial class DiagnosticReportBuilder
         double telemetryAgeMs = value.Telemetry.ObservedTimestamp == 0
             ? double.NaN
             : Stopwatch.GetElapsedTime(value.Telemetry.ObservedTimestamp).TotalMilliseconds;
-        report.AppendLine($"ACC shared memory: {(value.AccConnected ? "connected" : "not connected")}");
+        report.AppendLine($"ACC game process: {(value.AccConnected ? "detected" : "not detected")}");
         report.AppendLine($"Telemetry stale: {value.TelemetryStale}");
         report.AppendLine($"Telemetry packet: {value.Telemetry.PacketId}");
         report.AppendLine($"Telemetry age ms: {(double.IsNaN(telemetryAgeMs) ? "never observed" : telemetryAgeMs.ToString("F1"))}");

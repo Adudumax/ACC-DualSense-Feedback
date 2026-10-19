@@ -352,6 +352,51 @@
         <Setter Property="Margin" Value="{x:Static ui:UiTypography.SliderMargin}" />
     </Style>
 
+    <Style x:Key="Slider.LightPreview" TargetType="Slider" BasedOn="{StaticResource Slider.Compact}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid Height="36" Background="Transparent">
+                        <Track x:Name="PART_Track" VerticalAlignment="Center">
+                            <Track.DecreaseRepeatButton><RepeatButton Style="{StaticResource Slider.Decrease}" Command="Slider.DecreaseLarge" /></Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Width="24" Height="24">
+                                    <Thumb.Template><ControlTemplate TargetType="Thumb"><Ellipse Width="14" Height="14" Fill="#D7DCE1" /></ControlTemplate></Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton><RepeatButton Style="{StaticResource Slider.Increase}" Command="Slider.IncreaseLarge" /></Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Switch.Lighting" TargetType="ui:AnimatedSwitch">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ui:AnimatedSwitch">
+                    <Grid Background="Transparent">
+                        <Border x:Name="PART_Track" Width="42" Height="24" CornerRadius="12" VerticalAlignment="Center">
+                            <Border x:Name="PART_Thumb" Width="18" Height="18" Margin="3,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{StaticResource Brush.Window}" CornerRadius="9">
+                                <Border.RenderTransform><TranslateTransform /></Border.RenderTransform>
+                            </Border>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="PART_Track" Property="Opacity" Value="0.85" /></Trigger>
+                        <Trigger Property="IsPressed" Value="True"><Setter TargetName="PART_Thumb" Property="Opacity" Value="0.78" /></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.4" /></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="ScrollBar.ModuleButton" TargetType="RepeatButton">
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">

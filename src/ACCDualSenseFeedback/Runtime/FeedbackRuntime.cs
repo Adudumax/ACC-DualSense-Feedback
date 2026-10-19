@@ -4,6 +4,7 @@ using ACCDualSenseFeedback.Haptics;
 using ACCDualSenseFeedback.Hardware.DualSense;
 using ACCDualSenseFeedback.Telemetry;
 using ACCDualSenseFeedback.Ui;
+using ACCDualSenseFeedback.Lighting;
 
 namespace ACCDualSenseFeedback.Runtime;
 
@@ -14,6 +15,8 @@ internal sealed class FeedbackRuntime : IDisposable
     private readonly bool _useConsoleUi;
     private readonly Action<FeedbackRuntimeStatus>? _statusSink;
     private readonly Func<FeedbackTuning>? _tuningProvider;
+    private readonly Func<RpmLightSettings> _lightingProvider;
+    private readonly StartupTriggerConfirmation _startupConfirmation;
     private readonly TelemetryCsvCapture? _capture;
     private readonly LatestTelemetry _latest = new();
     private readonly AutoResetEvent _telemetryUpdated = new(false);
@@ -27,6 +30,8 @@ internal sealed class FeedbackRuntime : IDisposable
     private int _leftTriggerMode;
     private int _rightTriggerMode;
     private int _dualSenseConnected;
+    private int _accConnected;
+    private int _accProbeCompleted;
     private Exception? _backgroundFailure;
 
     public Exception? BackgroundFailure => Volatile.Read(ref _backgroundFailure);
@@ -36,12 +41,17 @@ internal sealed class FeedbackRuntime : IDisposable
         string? capturePath = null,
         Action<FeedbackRuntimeStatus>? statusSink = null,
         bool useConsoleUi = true,
-        Func<FeedbackTuning>? tuningProvider = null)
+        Func<FeedbackTuning>? tuningProvider = null,
+        Func<RpmLightSettings>? lightingProvider = null,
+        StartupTriggerConfirmation? startupConfirmation = null)
     {
         _dryRun = dryRun;
         _useConsoleUi = useConsoleUi;
         _statusSink = statusSink;
         _tuningProvider = tuningProvider;
+        RpmLightSettings initialLights = PortableLightSettingsStore.Load(out _);
+        _lightingProvider = lightingProvider ?? (() => initialLights);
+        _startupConfirmation = startupConfirmation ?? StartupTriggerConfirmation.ForProcess;
         _capture = capturePath is null ? null : new TelemetryCsvCapture(capturePath);
     }
 
@@ -83,12 +93,12 @@ internal sealed class FeedbackRuntime : IDisposable
             if (now >= nextStatus)
             {
                 TelemetrySnapshot status = _latest.Read();
-                bool accConnected = _reader.IsConnected;
+                bool accConnected = Volatile.Read(ref _accConnected) != 0;
                 bool dualSenseConnected = Volatile.Read(ref _dualSenseConnected) != 0;
                 bool telemetryStale = status.ObservedTimestamp == 0 || now - status.ObservedTimestamp > StaleTicks;
 
                 if (_useConsoleUi && accConnected && !previousAccConnection)
-                    ConsoleUi.Ready("ACC telemetry", "Shared-memory telemetry is connected.");
+                    ConsoleUi.Ready("ACC detected", "Game process is running. Waiting for fresh shared-memory telemetry.");
                 else if (_useConsoleUi && !accConnected && previousAccConnection)
                     ConsoleUi.Warning("ACC telemetry lost", "Feedback is cleared until the game starts publishing again.");
 
@@ -148,20 +158,41 @@ internal sealed class FeedbackRuntime : IDisposable
     {
         try
         {
-            int previousPacket = int.MinValue;
+            using var processMonitor = new AccProcessMonitor();
+            var session = new AccTelemetrySession();
             long lastPacketAt = Stopwatch.GetTimestamp();
             while (_running)
             {
-                if (!_reader.IsConnected && !_reader.TryConnect())
+                long now = Stopwatch.GetTimestamp();
+                if (session.SetProcess(processMonitor.GetProcessId(now)))
+                {
+                    _reader.Disconnect();
+                    _latest.Publish(default);
+                    _telemetryUpdated.Set();
+                }
+                Volatile.Write(ref _accConnected, session.IsGameRunning ? 1 : 0);
+                Volatile.Write(ref _accProbeCompleted, 1);
+                if (!session.IsGameRunning)
                 {
                     Thread.Sleep(250);
                     lastPacketAt = Stopwatch.GetTimestamp();
                     continue;
                 }
 
-                if (_reader.TryReadLatest(out TelemetrySnapshot snapshot) && snapshot.PacketId != previousPacket)
+                if (!_reader.IsConnected)
                 {
-                    previousPacket = snapshot.PacketId;
+                    if (!_reader.TryConnect())
+                    {
+                        Thread.Sleep(250);
+                        lastPacketAt = Stopwatch.GetTimestamp();
+                        continue;
+                    }
+                    session.ResetMapping();
+                    lastPacketAt = Stopwatch.GetTimestamp();
+                }
+
+                if (_reader.TryReadLatest(out TelemetrySnapshot snapshot) && session.TryAccept(snapshot))
+                {
                     lastPacketAt = snapshot.ObservedTimestamp;
                     _latest.Publish(snapshot);
                     Interlocked.Increment(ref _framesRead);
@@ -169,11 +200,13 @@ internal sealed class FeedbackRuntime : IDisposable
                 }
                 else
                 {
-                    long now = Stopwatch.GetTimestamp();
+                    now = Stopwatch.GetTimestamp();
                     if (now - lastPacketAt > 2 * Stopwatch.Frequency)
                     {
                         _reader.Disconnect();
-                        previousPacket = int.MinValue;
+                        session.ResetMapping();
+                        _latest.Publish(default);
+                        _telemetryUpdated.Set();
                         lastPacketAt = now;
                         Thread.Sleep(100);
                         continue;
@@ -194,6 +227,9 @@ internal sealed class FeedbackRuntime : IDisposable
     private void OutputLoop()
     {
         var engine = new CompetitionFeedbackEngine();
+        var lightsEngine = new RpmLightEngine();
+        using var lightMetadata = new AccLightingMetadataReader();
+        RpmLightFrame lights = RpmLightFrame.Off;
         DualSenseHidDevice? device = null;
         FeedbackFrame previous = FeedbackFrame.Off;
         long nextReconnect = 0;
@@ -239,15 +275,34 @@ internal sealed class FeedbackRuntime : IDisposable
                 }
                 if (!stale)
                     _capture?.TryWrite(snapshot, originalLarge, originalSmall, frame);
+                if (!_dryRun)
+                    frame = _startupConfirmation.Apply(frame, now, device is not null,
+                        Volatile.Read(ref _accProbeCompleted) != 0,
+                        Volatile.Read(ref _accConnected) != 0, !stale, _tuningProvider);
                 Volatile.Write(ref _leftTriggerMode, frame.LeftTrigger.Mode);
                 Volatile.Write(ref _rightTriggerMode, frame.RightTrigger.Mode);
-                // Reassert active trigger state at 50 Hz in case another valid HID
-                // report updates unrelated fields. Motor fields remain untouched.
+                // Preserve normal haptic send decisions and the 50 Hz heartbeat.
+                // The startup action uses this same writer; its final Off frame
+                // is a normal frame change and releases resistance immediately.
                 bool heartbeatDue = now - lastWriteAt >= Stopwatch.Frequency / 50;
                 if (frame == previous && !heartbeatDue)
                     continue;
 
                 previous = frame;
+                // Evaluate lighting on existing output reports, without adding
+                // HID writes or changing haptic inputs, frame or wake timing.
+                if (stale)
+                {
+                    lightsEngine.Reset();
+                    lightMetadata.Disconnect();
+                    lights = RpmLightFrame.Off;
+                }
+                else
+                {
+                    lightMetadata.Refresh(now);
+                    lights = lightsEngine.Compute(snapshot, now, _lightingProvider(), lightMetadata.MaxRpm,
+                        lightMetadata.Context);
+                }
                 if (_dryRun)
                 {
                     Interlocked.Increment(ref _framesWritten);
@@ -256,13 +311,14 @@ internal sealed class FeedbackRuntime : IDisposable
 
                 if (device is not null)
                 {
-                    if (device.TryWrite(frame))
+                    if (device.TryWrite(frame, lights))
                     {
                         Interlocked.Increment(ref _framesWritten);
                         lastWriteAt = now;
                     }
                     else
                     {
+                        _startupConfirmation.Cancel();
                         device.Dispose();
                         device = null;
                         Volatile.Write(ref _dualSenseConnected, 0);
@@ -276,6 +332,7 @@ internal sealed class FeedbackRuntime : IDisposable
         }
         finally
         {
+            if (!_dryRun) _startupConfirmation.Cancel();
             // Best effort: never leave an active motor or adaptive-trigger
             // command latched after a normal stop or recoverable thread fault.
             device?.TryWrite(FeedbackFrame.Off);

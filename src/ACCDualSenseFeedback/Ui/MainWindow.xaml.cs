@@ -44,6 +44,7 @@ public partial class MainWindow : Window
         _profileState = new FeedbackProfileState(_profile);
         _recoveredFromInvalidSettings = recovered;
         InitializeComponent();
+        InitializeLightingControls();
         ApplyProfileVisuals(animate: false);
         BrakeResistanceSlider.ValueChanged += FeedbackSlider_ValueChanged;
         ThrottleResistanceSlider.ValueChanged += FeedbackSlider_ValueChanged;
@@ -143,7 +144,8 @@ public partial class MainWindow : Window
                     dryRun: false,
                     statusSink: OnRuntimeStatus,
                     useConsoleUi: false,
-                    tuningProvider: () => _profileState.CurrentTuning);
+                    tuningProvider: () => _profileState.CurrentTuning,
+                    lightingProvider: () => _lightSettingsState.Current);
                 runtime.Run(cancellationToken);
                 if (runtime.BackgroundFailure is not null)
                     throw new InvalidOperationException(runtime.BackgroundFailure.Message, runtime.BackgroundFailure);
@@ -784,6 +786,7 @@ public partial class MainWindow : Window
             return;
 
         _closing = true;
+        FlushLightingSettingsOnClose();
         _ = Dispatcher.BeginInvoke(
             DispatcherPriority.Background,
             new Action(() => _ = CompleteClosingAsync()));

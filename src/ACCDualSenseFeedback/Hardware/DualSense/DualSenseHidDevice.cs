@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using ACCDualSenseFeedback.Haptics;
+using ACCDualSenseFeedback.Lighting;
 
 namespace ACCDualSenseFeedback.Hardware.DualSense;
 
@@ -25,6 +26,7 @@ internal sealed class DualSenseHidDevice : IDisposable
 
     private readonly SafeFileHandle _handle;
     private readonly byte[] _reportBuffer = new byte[DualSenseReportBuilder.BluetoothReportLength];
+    private bool _initializeLights = true;
 
     public DualSenseDeviceInfo Info { get; }
 
@@ -137,20 +139,22 @@ internal sealed class DualSenseHidDevice : IDisposable
         return null;
     }
 
-    public bool TryWrite(in FeedbackFrame frame)
+    public bool TryWrite(in FeedbackFrame frame, RpmLightFrame lights = default)
     {
         try
         {
             int length = DualSenseReportBuilder.Build(
                 frame,
                 Info.Transport == DualSenseTransport.Bluetooth,
-                _reportBuffer);
-            return NativeMethods.WriteFile(
+                _reportBuffer, lights, _initializeLights);
+            bool success = NativeMethods.WriteFile(
                 _handle,
                 _reportBuffer,
                 (uint)length,
                 out uint written,
                 IntPtr.Zero) && written == length;
+            if (success) _initializeLights = false;
+            return success;
         }
         catch (IOException)
         {

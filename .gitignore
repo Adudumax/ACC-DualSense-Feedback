@@ -16,3 +16,5 @@ tools/Inspect-DotNetMethodIl.ps1
 tools/recover_concept_b_history.ps1
 ACCDualSenseFeedback.settings.json
 ACCDualSenseFeedback.settings.json.tmp
+ACCDualSenseFeedback.lights.json
+ACCDualSenseFeedback.lights.json.tmp

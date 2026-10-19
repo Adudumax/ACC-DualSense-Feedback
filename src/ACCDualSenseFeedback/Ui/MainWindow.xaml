@@ -370,6 +370,36 @@
                                     <Slider x:Name="CollisionFeedbackSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Collision impact strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 60.&quot;}" />
                                     <TextBlock x:Name="CollisionFeedbackValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;60 · Standard&quot;}" />
                                 </Grid>
+
+                                <Border Height="1" Margin="0,14,0,17" Background="{DynamicResource Brush.BorderStrong}" />
+                                <Grid x:Name="LightingSection" Margin="0,0,0,6" MinHeight="50">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Top" Margin="0,3,0,0" FontFamily="{StaticResource Font.Latin}" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="06" />
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Controller lights&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;RPM, idle and braking cues · saved separately&quot;}" />
+                                    </StackPanel>
+                                    <ui:AnimatedSwitch x:Name="LightsEnabledSwitch" Grid.Column="2" Style="{StaticResource Switch.Lighting}" Checked="LightingOptionChanged" Unchecked="LightingOptionChanged" AutomationProperties.Name="{ui:Translate Text=&quot;Enable controller lights&quot;}" />
+                                </Grid>
+                                <Grid x:Name="LightModeOptions" Height="54" Margin="31,0,0,0">
+                                    <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center" FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;RPM color&quot;}" />
+                                    <Grid Grid.Column="1" Width="208" Height="42" Background="{DynamicResource Brush.Surface}" ClipToBounds="True">
+                                        <Grid.Clip><RectangleGeometry Rect="0,0,208,42" RadiusX="9" RadiusY="9" /></Grid.Clip>
+                                        <Border Width="100" Height="34" Margin="4" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource Brush.TextPrimary}" CornerRadius="7">
+                                            <Border.RenderTransform><TranslateTransform x:Name="LightModeSelectionTranslate" /></Border.RenderTransform>
+                                        </Border>
+                                        <Grid Margin="4">
+                                            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
+                                            <Button x:Name="SmoothLightButton" Style="{StaticResource Button.Segment}" Click="SmoothLights_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Smooth RPM colors&quot;}">
+                                                <TextBlock x:Name="SmoothLightLabel" FontSize="12" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Smooth&quot;}" />
+                                            </Button>
+                                            <Button x:Name="DiscreteLightButton" Grid.Column="1" Style="{StaticResource Button.Segment}" Click="DiscreteLights_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Discrete RPM colors&quot;}">
+                                                <TextBlock x:Name="DiscreteLightLabel" FontSize="12" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Discrete&quot;}" />
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
                             </StackPanel>
                         </ScrollViewer>
 

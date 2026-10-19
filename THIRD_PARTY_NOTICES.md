@@ -10,6 +10,19 @@ The ACC shared-memory field order follows Kunos' ACC Shared Memory documentation
 
 https://github.com/rrennoir/PyAccSharedMemory
 
+## CSP controller lighting
+
+The controller-light colour function and player-LED rules are ported from
+`led_colors.lua` and `dualsense_lights.lua` in Ilja Jusupov's CSP Lua internals,
+revision `2031bd2d7c913e0aad3ff18a3bab86ffccad1326`.
+
+Source: https://github.com/ac-custom-shaders-patch/acc-lua-internal<br>
+License: MIT, Copyright (c) 2022 Ilja Jusupov; reproduced in
+`licenses/CSP-LUA-INTERNAL-LICENSE.txt`. Original reference scripts and
+development-only comparison fixtures are kept in `tests/Reference/Csp` and are
+not bundled into the portable application. ACC input limitations are described
+in `docs/CSP-LIGHTING-ANALYSIS.zh-CN.md` in the source repository.
+
 ## Nefarius ViGEm .NET Client
 
 The integrated virtual Xbox 360 bridge uses `Nefarius.ViGEm.Client` 1.21.256.

@@ -1,6 +1,6 @@
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+$')]
-    [string]$Version = '1.0.1',
+    [ValidatePattern('^\d+\.\d+\.\d+(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?$')]
+    [string]$Version = '1.1.0',
 
     [string]$OutputRoot = '',
 
@@ -26,7 +26,7 @@ else {
 $portableName = "ACCDualSenseFeedback-v$Version-win-x64$languageSuffix-portable"
 $portablePath = Join-Path $releaseRoot $portableName
 $zipPath = Join-Path $releaseRoot "$portableName.zip"
-$assemblyVersion = "$Version.0"
+$assemblyVersion = "$($Version.Split('-')[0]).0"
 
 if (Test-Path -LiteralPath $releaseRoot) {
     throw "Release output already exists: $releaseRoot. Preserve it or move it before rebuilding."
@@ -61,7 +61,8 @@ $requiredRelativePaths = @(
     'ACCDualSenseFeedback.exe',
     'licenses\ACC-DUALSENSE-FEEDBACK-LICENSE.txt',
     'licenses\THIRD_PARTY_NOTICES.md',
-    'licenses\VIGEM-NET-LICENSE.txt'
+    'licenses\VIGEM-NET-LICENSE.txt',
+    'licenses\CSP-LUA-INTERNAL-LICENSE.txt'
 )
 $requiredRelativePaths += if ($Language -eq 'zh-CN') {
     $chineseReadmeName = (-join @(

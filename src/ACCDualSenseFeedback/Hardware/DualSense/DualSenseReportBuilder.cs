@@ -1,4 +1,5 @@
 using ACCDualSenseFeedback.Haptics;
+using ACCDualSenseFeedback.Lighting;
 
 namespace ACCDualSenseFeedback.Hardware.DualSense;
 
@@ -17,7 +18,8 @@ internal static class DualSenseReportBuilder
     private const byte ValidSecondaryFeedback = 0x55;
     private const byte AccurateRumbleMode = 0x06;
 
-    public static int Build(in FeedbackFrame frame, bool bluetooth, Span<byte> destination)
+    public static int Build(in FeedbackFrame frame, bool bluetooth, Span<byte> destination,
+        RpmLightFrame lights = default, bool initializeLights = false)
     {
         int length = bluetooth ? BluetoothReportLength : UsbReportLength;
         if (destination.Length < length)
@@ -37,8 +39,12 @@ internal static class DualSenseReportBuilder
             frame.RightTrigger.WriteTo(report.Slice(12, 11));
             frame.LeftTrigger.WriteTo(report.Slice(23, 11));
             report[40] = AccurateRumbleMode;
-            report[43] = 0x02;
-            report[44] = 0x02;
+            report[43] = initializeLights ? (byte)0x02 : (byte)0;
+            report[44] = lights.PlayerBrightness;
+            report[45] = lights.PlayerMask;
+            report[46] = lights.Red;
+            report[47] = lights.Green;
+            report[48] = lights.Blue;
             uint crc = Crc32.ComputeBluetoothOutput(report[..74]);
             report[74] = (byte)crc;
             report[75] = (byte)(crc >> 8);
@@ -55,8 +61,14 @@ internal static class DualSenseReportBuilder
             frame.RightTrigger.WriteTo(report.Slice(11, 11));
             frame.LeftTrigger.WriteTo(report.Slice(22, 11));
             report[39] = AccurateRumbleMode;
-            report[42] = 0x02;
-            report[43] = 0x02;
+            // End the firmware light animation on first output only; repeating
+            // LIGHT_OUT would fight the RGB colour on every haptic report.
+            report[42] = initializeLights ? (byte)0x02 : (byte)0;
+            report[43] = lights.PlayerBrightness;
+            report[44] = lights.PlayerMask;
+            report[45] = lights.Red;
+            report[46] = lights.Green;
+            report[47] = lights.Blue;
         }
 
         return length;
