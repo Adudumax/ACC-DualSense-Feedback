@@ -15,7 +15,7 @@
 
 **[⬇ 下载最新便携版](https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest)** · [快速开始](#-快速开始) · [诊断问题](#-诊断与故障排查)
 
-USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪后，反馈会自动运行。关闭应用即可停止反馈并释放虚拟手柄；最小化不会停止运行。
+连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪后，反馈会自动运行。关闭应用即可停止反馈并释放虚拟手柄；最小化不会停止运行。
 
 ![随时就绪——自动反馈，并提供经过校准的默认与自定义预设。](docs/assets/github/readme-showcase/home-ready-en.png)
 
@@ -45,7 +45,7 @@ USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪�
 
 - Windows 10 或 Windows 11，**x64**。
 - PC 版 Assetto Corsa Competizione。
-- 通过 **USB** 连接的 DualSense 或 DualSense Edge；暂不支持蓝牙。
+- DualSense 或 DualSense Edge；**推荐使用 USB 连接**，其他连接方式请自行测试。
 - **ViGEmBus** 虚拟手柄驱动：[官方下载页](https://github.com/nefarius/ViGEmBus/releases)。
 - 为 ACC **禁用 Steam Input**。
 - 如果你使用 DS4Windows，运行本应用时请**完全退出**。
@@ -58,7 +58,7 @@ USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪�
 
 1. 下载 ZIP，**完整解压到可写入的文件夹**；不要直接在压缩包内运行 EXE。
 2. 按需安装 ViGEmBus；如果安装程序要求重启，请先重启 Windows。
-3. 用 USB 连接 DualSense；如果你使用 DS4Windows，请先完全退出。
+3. 连接 DualSense；如果你使用 DS4Windows，请先完全退出。
 4. 在 Steam 的 ACC 控制器设置中禁用 Steam Input。
 5. 如果使用 HidHide，按上文允许本应用访问手柄。
 6. 打开 `ACCDualSenseFeedback.exe`，启动 ACC 并进入驾驶。
@@ -92,8 +92,8 @@ USB 连接手柄，打开应用，然后进入驾驶。DualSense 与 ACC 就绪�
 
 | 状态或现象 | 建议检查 |
 | --- | --- |
-| 未检测到 DualSense | USB 数据线，以及 HidHide 是否允许本应用访问。 |
-| 反馈不可用 | ViGEmBus、USB 与 HidHide；原因不明确时附上诊断报告。 |
+| 未检测到 DualSense | 手柄连接，以及 HidHide 是否允许本应用访问。 |
+| 反馈不可用 | ViGEmBus、手柄连接与 HidHide；原因不明确时附上诊断报告。 |
 | 需要处理 | 完全退出 DS4Windows，然后点击**重新检查**。 |
 | 等待 ACC / 等待驾驶 | 启动 ACC 并进入驾驶；停留在游戏菜单不属于驾驶状态。 |
 | 手柄重复输入 | 禁用 Steam Input、关闭其他手柄模拟工具，必要时配置 HidHide。 |

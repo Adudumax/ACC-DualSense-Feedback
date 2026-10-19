@@ -15,7 +15,7 @@ A lightweight Windows companion that gives **Assetto Corsa Competizione** richer
 
 **[⬇ Download the latest portable release](https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest)** · [Quick start](#-quick-start) · [Get help](#-diagnostics--troubleshooting)
 
-Connect your controller by USB, open the app, and drive. Feedback starts automatically when the DualSense and ACC are ready. Close the app to stop feedback and release the virtual controller; minimizing keeps it running.
+Connect your controller, open the app, and drive. Feedback starts automatically when the DualSense and ACC are ready. Close the app to stop feedback and release the virtual controller; minimizing keeps it running.
 
 ![Ready when you are — automatic feedback with calibrated Default and Custom presets.](docs/assets/github/readme-showcase/home-ready-en.png)
 
@@ -45,7 +45,7 @@ Both editions use the same feedback engine and calibrated defaults. They are sel
 
 - Windows 10 or Windows 11, **x64**.
 - Assetto Corsa Competizione for PC.
-- DualSense or DualSense Edge connected by **USB**. Bluetooth is not supported.
+- DualSense or DualSense Edge. **USB connection is recommended**; please test other connection methods with your setup.
 - **ViGEmBus** virtual-controller driver: [download the official release](https://github.com/nefarius/ViGEmBus/releases).
 - Steam Input **disabled for ACC**.
 - If you use DS4Windows, keep it **fully closed** while this app is running.
@@ -58,7 +58,7 @@ Install **ViGEmBus**, not ViGEm.NET. The ViGEm.NET client is already included in
 
 1. Download the ZIP and **extract it completely to a writable folder**. Do not run the EXE from inside the archive.
 2. Install ViGEmBus if needed, then restart Windows if its installer asks you to.
-3. Connect the DualSense by USB. If you use DS4Windows, fully exit it first.
+3. Connect the DualSense. If you use DS4Windows, fully exit it first.
 4. Disable Steam Input in ACC's Steam controller settings.
 5. If you use HidHide, allow this EXE as described above.
 6. Open `ACCDualSenseFeedback.exe`, start ACC, and enter a driving session.
@@ -92,8 +92,8 @@ If something does not work, open **Diagnostics and logs → Copy diagnostic repo
 
 | App status or symptom | What to check |
 | --- | --- |
-| DualSense unavailable | USB data cable and HidHide application access. |
-| Feedback unavailable | ViGEmBus, USB and HidHide; attach the diagnostic report if the cause is unclear. |
+| DualSense unavailable | Controller connection and HidHide application access. |
+| Feedback unavailable | ViGEmBus, controller connection and HidHide; attach the diagnostic report if the cause is unclear. |
 | Action needed | Fully exit DS4Windows, then select **Check again**. |
 | Waiting for ACC / driving | Start ACC and enter a driving session; the game menu is not a driving session. |
 | Duplicate controller input | Disable Steam Input, close other controller emulators, and configure HidHide if needed. |
