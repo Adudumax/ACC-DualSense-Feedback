@@ -36,8 +36,8 @@
 
 进入 **[最新 Release](https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest)**，选择一个 Windows x64 ZIP：
 
-- **英文版：** `ACCDualSenseFeedback-v1.0.1-win-x64-portable.zip`
-- **简体中文版：** `ACCDualSenseFeedback-v1.0.1-win-x64-zh-CN-portable.zip`
+- **英文版：** `ACCDualSenseFeedback-v1.1.2-win-x64-portable.zip`
+- **简体中文版：** `ACCDualSenseFeedback-v1.1.2-win-x64-zh-CN-portable.zip`
 
 两个版本使用相同的反馈算法与校准参数。便携包已经包含 .NET 运行时，无需安装应用或另行安装 .NET；中文版也包含所需字体。完整解压后，请保留 EXE 随附的 `licenses` 文件夹。
 
@@ -82,7 +82,7 @@
 
 反馈强度可在 **0–100 之间按 1 调节**。将某项设为 **0，只会关闭该项反馈**。右击参数行可恢复该项的校准默认值。修改会立即生效并切换至自定义；切回默认预设不会删除已保存的自定义数值。
 
-**红线脉冲起点**控制反馈开始的时机，范围为车辆最高转速的 **94.0%–99.0%**；它不是强度设置。
+**“红线脉冲起点”保持默认 96.2%，已支持车型才会使用原生仪表报警点自动适配。** 修改后，R2 改用最高转速 **94.0%–99.0%** 的手动比例，灯光恢复 **97%** 通用参考，不再保证与仪表同步。右键该行可恢复默认；调整力度请使用独立强度控件。未知车型沿用通用转速提示。
 
 自定义数值保存在 EXE 同目录的 `ACCDualSenseFeedback.settings.json`。移动已经调好的应用时，请一并保留此文件。中英文版使用相同的设置格式。
 

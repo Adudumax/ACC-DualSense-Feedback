@@ -1,0 +1,336 @@
+{
+  "gameVersion": "1.10.4",
+  "source": "Native CarData.EngineData fields from ACC 1.10.4; no manually chosen RPM values.",
+  "profiles": [
+    {
+      "carModel": "alpine_a110_gt4",
+      "suggestedRpm": 6000,
+      "alarmRpm": 6300,
+      "limiterRpm": 6450
+    },
+    {
+      "carModel": "amr_v12_vantage_gt3",
+      "suggestedRpm": 7300,
+      "alarmRpm": 7600,
+      "limiterRpm": 7750
+    },
+    {
+      "carModel": "amr_v8_vantage_gt3",
+      "suggestedRpm": 6800,
+      "alarmRpm": 7000,
+      "limiterRpm": 7300
+    },
+    {
+      "carModel": "amr_v8_vantage_gt4",
+      "suggestedRpm": 6500,
+      "alarmRpm": 6800,
+      "limiterRpm": 7000
+    },
+    {
+      "carModel": "audi_r8_gt4",
+      "suggestedRpm": 7400,
+      "alarmRpm": 8400,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "audi_r8_lms",
+      "suggestedRpm": 7600,
+      "alarmRpm": 7900,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "audi_r8_lms_evo",
+      "suggestedRpm": 7600,
+      "alarmRpm": 7900,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "audi_r8_lms_evo_ii",
+      "suggestedRpm": 7600,
+      "alarmRpm": 7900,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "audi_r8_lms_gt2",
+      "suggestedRpm": 7400,
+      "alarmRpm": 8400,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "bentley_continental_gt3_2016",
+      "suggestedRpm": 6600,
+      "alarmRpm": 7000,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "bentley_continental_gt3_2018",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7250,
+      "limiterRpm": 7400
+    },
+    {
+      "carModel": "bmw_m2_cs_racing",
+      "suggestedRpm": 6800,
+      "alarmRpm": 7000,
+      "limiterRpm": 7520
+    },
+    {
+      "carModel": "bmw_m4_gt3",
+      "suggestedRpm": 6500,
+      "alarmRpm": 6750,
+      "limiterRpm": 7000
+    },
+    {
+      "carModel": "bmw_m4_gt4",
+      "suggestedRpm": 6800,
+      "alarmRpm": 7000,
+      "limiterRpm": 7600
+    },
+    {
+      "carModel": "bmw_m6_gt3",
+      "suggestedRpm": 6200,
+      "alarmRpm": 6280,
+      "limiterRpm": 7100
+    },
+    {
+      "carModel": "brabham_bt62_gt2",
+      "suggestedRpm": 6000,
+      "alarmRpm": 6300,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "chevrolet_camaro_gt4r",
+      "suggestedRpm": 6000,
+      "alarmRpm": 7000,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "ferrari_296_gt3",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7200,
+      "limiterRpm": 8000
+    },
+    {
+      "carModel": "ferrari_488_challenge_evo",
+      "suggestedRpm": 6900,
+      "alarmRpm": 7100,
+      "limiterRpm": 8000
+    },
+    {
+      "carModel": "ferrari_488_gt3",
+      "suggestedRpm": 6900,
+      "alarmRpm": 7100,
+      "limiterRpm": 7300
+    },
+    {
+      "carModel": "ferrari_488_gt3_evo",
+      "suggestedRpm": 6900,
+      "alarmRpm": 7100,
+      "limiterRpm": 7300
+    },
+    {
+      "carModel": "ford_mustang_gt3",
+      "suggestedRpm": 7900,
+      "alarmRpm": 8150,
+      "limiterRpm": 8350
+    },
+    {
+      "carModel": "ginetta_g55_gt4",
+      "suggestedRpm": 6800,
+      "alarmRpm": 7000,
+      "limiterRpm": 7200
+    },
+    {
+      "carModel": "honda_nsx_gt3",
+      "suggestedRpm": 6800,
+      "alarmRpm": 7100,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "honda_nsx_gt3_evo",
+      "suggestedRpm": 6800,
+      "alarmRpm": 7000,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "jaguar_g3",
+      "suggestedRpm": 7900,
+      "alarmRpm": 8100,
+      "limiterRpm": 8750
+    },
+    {
+      "carModel": "ktm_xbow_gt2",
+      "suggestedRpm": 6900,
+      "alarmRpm": 7250,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "ktm_xbow_gt4",
+      "suggestedRpm": 6000,
+      "alarmRpm": 6300,
+      "limiterRpm": 6500
+    },
+    {
+      "carModel": "lamborghini_gallardo_rex",
+      "suggestedRpm": 7800,
+      "alarmRpm": 8200,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "lamborghini_huracan_gt3",
+      "suggestedRpm": 7600,
+      "alarmRpm": 7900,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "lamborghini_huracan_gt3_evo",
+      "suggestedRpm": 7600,
+      "alarmRpm": 7900,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "lamborghini_huracan_gt3_evo2",
+      "suggestedRpm": 7600,
+      "alarmRpm": 7900,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "lamborghini_huracan_st",
+      "suggestedRpm": 7600,
+      "alarmRpm": 7900,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "lamborghini_huracan_st_evo2",
+      "suggestedRpm": 7600,
+      "alarmRpm": 7900,
+      "limiterRpm": 8650
+    },
+    {
+      "carModel": "lexus_rc_f_gt3",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7250,
+      "limiterRpm": 7750
+    },
+    {
+      "carModel": "maserati_mc20_gt2",
+      "suggestedRpm": 7500,
+      "alarmRpm": 7700,
+      "limiterRpm": 8000
+    },
+    {
+      "carModel": "maserati_mc_gt4",
+      "suggestedRpm": 6500,
+      "alarmRpm": 6800,
+      "limiterRpm": 7000
+    },
+    {
+      "carModel": "mclaren_570s_gt4",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7400,
+      "limiterRpm": 7600
+    },
+    {
+      "carModel": "mclaren_650s_gt3",
+      "suggestedRpm": 6700,
+      "alarmRpm": 7000,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "mclaren_720s_gt3",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7400,
+      "limiterRpm": 7700
+    },
+    {
+      "carModel": "mclaren_720s_gt3_evo",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7300,
+      "limiterRpm": 7700
+    },
+    {
+      "carModel": "mercedes_amg_gt2",
+      "suggestedRpm": 6750,
+      "alarmRpm": 7000,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "mercedes_amg_gt3",
+      "suggestedRpm": 6800,
+      "alarmRpm": 7100,
+      "limiterRpm": 7900
+    },
+    {
+      "carModel": "mercedes_amg_gt3_evo",
+      "suggestedRpm": 6800,
+      "alarmRpm": 7100,
+      "limiterRpm": 7900
+    },
+    {
+      "carModel": "mercedes_amg_gt4",
+      "suggestedRpm": 6500,
+      "alarmRpm": 6800,
+      "limiterRpm": 7000
+    },
+    {
+      "carModel": "nissan_gt_r_gt3_2017",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7200,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "nissan_gt_r_gt3_2018",
+      "suggestedRpm": 6750,
+      "alarmRpm": 7000,
+      "limiterRpm": 7500
+    },
+    {
+      "carModel": "porsche_718_cayman_gt4_mr",
+      "suggestedRpm": 7400,
+      "alarmRpm": 7600,
+      "limiterRpm": 7800
+    },
+    {
+      "carModel": "porsche_935",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7100,
+      "limiterRpm": 7250
+    },
+    {
+      "carModel": "porsche_991_gt3_r",
+      "suggestedRpm": 8700,
+      "alarmRpm": 9000,
+      "limiterRpm": 9250
+    },
+    {
+      "carModel": "porsche_991ii_gt2_rs_cs_evo",
+      "suggestedRpm": 7000,
+      "alarmRpm": 7100,
+      "limiterRpm": 7250
+    },
+    {
+      "carModel": "porsche_991ii_gt3_cup",
+      "suggestedRpm": 8000,
+      "alarmRpm": 8300,
+      "limiterRpm": 8500
+    },
+    {
+      "carModel": "porsche_991ii_gt3_r",
+      "suggestedRpm": 8850,
+      "alarmRpm": 9000,
+      "limiterRpm": 9250
+    },
+    {
+      "carModel": "porsche_992_gt3_cup",
+      "suggestedRpm": 8000,
+      "alarmRpm": 8300,
+      "limiterRpm": 8750
+    },
+    {
+      "carModel": "porsche_992_gt3_r",
+      "suggestedRpm": 8850,
+      "alarmRpm": 9000,
+      "limiterRpm": 9250
+    }
+  ]
+}

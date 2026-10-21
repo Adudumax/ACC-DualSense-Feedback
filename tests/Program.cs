@@ -109,6 +109,7 @@ internal static class Program
         LightingChecks.Run(Check);
         AccLightingChecks.Run(Check);
         StartupConfirmationChecks.Run(Check);
+        ShiftCueChecks.Run(Check);
         if (args.Length == 2 && args[0] == "--render-ui") Check("WPF lighting controls render without starting the runtime", () => RenderUi(args[1]));
         Console.WriteLine($"{_checks - _failures}/{_checks} checks passed");
         return _failures == 0 ? 0 : 1;

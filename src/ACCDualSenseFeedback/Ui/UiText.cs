@@ -12,6 +12,7 @@ public static class UiText
     private static readonly Dictionary<string, string> Translations = new(StringComparer.Ordinal)
     {
         ["Minimize"] = "最小化",
+        ["At the default 96.2%, supported cars automatically use ACC's native HUD alarm RPM. Changing this value restores manual redline timing."] = "保持默认 96.2% 时，已支持车型自动使用 ACC 原生仪表报警转速；修改此值后恢复手动红线时机。",
         ["Close"] = "关闭",
         ["Starting"] = "正在启动",
         ["Preparing the controller path."] = "正在建立手柄连接。",

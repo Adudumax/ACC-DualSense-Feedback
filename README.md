@@ -36,8 +36,8 @@ The app forwards your physical controller through a virtual Xbox 360 controller 
 
 Open **[the latest Release](https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest)** and choose one Windows x64 ZIP:
 
-- **English:** `ACCDualSenseFeedback-v1.0.1-win-x64-portable.zip`
-- **简体中文:** `ACCDualSenseFeedback-v1.0.1-win-x64-zh-CN-portable.zip`
+- **English:** `ACCDualSenseFeedback-v1.1.2-win-x64-portable.zip`
+- **简体中文:** `ACCDualSenseFeedback-v1.1.2-win-x64-zh-CN-portable.zip`
 
 Both editions use the same feedback engine and calibrated defaults. They are self-contained: no installer or separate .NET installation is required. Extract the ZIP and keep the included `licenses` folder beside the EXE.
 
@@ -82,7 +82,7 @@ Start with **Default** for the calibrated experience. Choose **Custom** or open 
 
 Strength controls cover **0–100 in one-point steps**. Setting a cue to **0 turns only that cue off**. Right-click a parameter row to restore its calibrated default. Changes apply immediately and select Custom; returning to Default does not erase your Custom values.
 
-**Pulse begins** controls when redline feedback starts: **94.0%–99.0% of the car's maximum RPM**. It is a timing control, not another strength setting.
+**Keep Pulse begins at its default 96.2% for automatic native HUD timing on supported cars.** Changing it selects manual R2 timing at **94.0%–99.0% of maximum RPM** and returns lighting to its generic **97%** reference; HUD synchronization is no longer guaranteed. Right-click the row to restore the default. Use the separate strength controls to adjust intensity. Unknown cars retain the generic RPM-based cue.
 
 Custom values are stored beside the EXE in `ACCDualSenseFeedback.settings.json`. Keep that file when moving an already configured copy of the app. English and Chinese editions share the same settings format.
 

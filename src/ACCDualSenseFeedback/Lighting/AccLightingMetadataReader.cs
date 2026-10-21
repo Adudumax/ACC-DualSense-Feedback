@@ -1,10 +1,11 @@
 using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
+using System.Text;
 
 namespace ACCDualSenseFeedback.Lighting;
 
-// Only lighting uses this optional static-page reader. The existing physics
-// reader, snapshots and haptic calculations are deliberately left untouched.
+// Optional read-only car metadata for lighting and calibrated shift cues.
+// The physics reader and its raw snapshots are deliberately left untouched.
 internal sealed class AccLightingMetadataReader : IDisposable
 {
     private MemoryMappedFile? _map;
@@ -13,6 +14,7 @@ internal sealed class AccLightingMetadataReader : IDisposable
     private readonly string[] _mapNames;
     private readonly AccLightingGraphicsReader _graphics;
     public int MaxRpm { get; private set; }
+    public string CarModel { get; private set; } = "";
     public CspLightContext Context => _graphics.Context;
 
     public AccLightingMetadataReader(string[]? mapNames = null, string[]? graphicsMapNames = null)
@@ -49,6 +51,11 @@ internal sealed class AccLightingMetadataReader : IDisposable
             // sectorCount at 400, maxTorque 404, maxPower 408, maxRpm 412.
             int rpm = _view.ReadInt32(412);
             MaxRpm = RpmLightEngine.IsValidMaxRpm(rpm) ? rpm : 0;
+            // Read only the car ID, never the nearby player identity fields.
+            var carName = new byte[66];
+            _view.ReadArray(68, carName, 0, carName.Length);
+            string raw = Encoding.Unicode.GetString(carName).Split('\0')[0];
+            CarModel = new string(raw.Where(c => char.IsAsciiLetterOrDigit(c) || c is '_' or '-' or '.').ToArray());
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
         {
@@ -63,6 +70,7 @@ internal sealed class AccLightingMetadataReader : IDisposable
         _view = null; _map = null;
         _graphics.Disconnect();
         MaxRpm = 0;
+        CarModel = "";
         _nextRead = 0;
     }
     public void Dispose() => Disconnect();

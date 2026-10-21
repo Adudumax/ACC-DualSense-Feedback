@@ -283,7 +283,7 @@
                                     <TextBlock x:Name="RedlinePulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
                                 </Grid>
                                 <Border Height="1" Background="{DynamicResource Brush.Border}" />
-                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="RedlineStartPermille" PreviewMouseRightButtonUp="FeedbackParameter_RightClick">
+                                <Grid Height="{x:Static ui:UiTypography.ParameterRowHeight}" Background="Transparent" Tag="RedlineStartPermille" PreviewMouseRightButtonUp="FeedbackParameter_RightClick" ToolTip="{ui:Translate Text=&quot;At the default 96.2%, supported cars automatically use ACC's native HUD alarm RPM. Changing this value restores manual redline timing.&quot;}">
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Pulse begins&quot;}" />

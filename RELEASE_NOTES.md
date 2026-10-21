@@ -1,3 +1,32 @@
+# ACC DualSense Feedback 1.1.2
+
+Aligns R2 shift reminders and RPM lighting with ACC's native HUD alarm points for supported cars.
+
+> [!IMPORTANT]
+> **Keep “Pulse begins” at its default 96.2% to retain automatic HUD-aligned timing.**
+>
+> Changing this value makes R2 use your selected RPM percentage and returns lighting to its generic **97%** reference. **They may no longer match the HUD.**
+>
+> Right-click the “Pulse begins” row to restore the default. Use the separate strength controls to adjust feedback intensity.
+
+## ✨ Added
+
+- Built-in native RPM profiles for 55 cars, with automatic car matching and no manual car selection.
+- R2 shift reminders and RPM lighting now share the same alarm reference.
+
+## ✅ Fixed
+
+- Fixed late shift reminders and RPM lighting on some cars, especially in higher gears.
+- Matched cars no longer trigger an automatic upshift alarm in sixth gear.
+
+Input forwarding, main vibration, base trigger resistance and other feedback mechanisms are retained.
+
+Unknown cars retain the existing generic RPM-based cue.
+
+See docs/RELEASE-v1.1.2.md for the release downloads and checksums.
+
+---
+
 # ACC DualSense Feedback 1.1.0
 
 Adds controller lighting for ACC and fixes false game detection at startup.

@@ -84,7 +84,8 @@ internal sealed class CompetitionFeedbackEngine
         long now,
         byte originalLargeMotor,
         byte originalSmallMotor,
-        in FeedbackTuning tuning)
+        in FeedbackTuning tuning,
+        AccShiftCueState shiftCue = default)
     {
         float deltaSeconds = _lastUpdate == 0
             ? 0.004f
@@ -148,6 +149,9 @@ internal sealed class CompetitionFeedbackEngine
         float redlineEnd = MathF.Min(0.999f, MathF.Max(0.997f, redlineStart + 0.015f));
         float redline = SmoothStep(redlineStart, redlineEnd, rpmRatio)
             * SmoothStep(0.78f, 0.97f, gas);
+        if (shiftCue.ResetEnvelope) _redlineEnvelope = 0;
+        if (shiftCue.Calibrated)
+            redline = (shiftCue.Active ? 1f : 0f) * SmoothStep(0.78f, 0.97f, gas);
 
         if (_previousGear != int.MinValue &&
             t.Gear > _previousGear &&

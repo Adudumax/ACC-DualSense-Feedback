@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using ACCDualSenseFeedback.Telemetry;
+using ACCDualSenseFeedback.Haptics;
 
 namespace ACCDualSenseFeedback.Lighting;
 
@@ -17,7 +18,8 @@ internal sealed class RpmLightEngine
     private double _shiftStarted = double.NaN;
 
     public RpmLightFrame Compute(in TelemetrySnapshot telemetry, long now,
-        RpmLightSettings settings, int staticMaxRpm = 0, CspLightContext context = default)
+        RpmLightSettings settings, int staticMaxRpm = 0, CspLightContext context = default,
+        AccShiftCueState shiftCue = default)
     {
         if (!settings.Enabled || !IsValidMaxRpm(staticMaxRpm) ||
             telemetry.IsEngineRunning == 0 || telemetry.Rpm <= 0 ||
@@ -33,14 +35,16 @@ internal sealed class RpmLightEngine
         _lastAt = now;
         if (!context.IsPaused) _time += dt;
 
-        // This is an explicit generic visual range, not a claimed optimal
-        // shift point. No unverified per-car or engine-map table is shipped.
+        // Keep the existing visual curve; a supported native HUD alarm only
+        // changes its endpoint. Unknown cars retain the generic visual range.
         double ratio = telemetry.Rpm / (double)staticMaxRpm;
-        double progress = Math.Clamp((ratio - 0.60) / 0.37, 0, 1);
+        double endRatio = shiftCue.Calibrated ? shiftCue.ReferenceRpm / (double)staticMaxRpm : 0.97;
+        double range = shiftCue.Calibrated ? endRatio - 0.60 : 0.37;
+        double progress = Math.Clamp((ratio - 0.60) / range, 0, 1);
         byte mask = 0;
         if (ratio >= 0.60)
             for (int i = 0; i < 5; i++)
-                if (ratio >= 0.60 + 0.37 * i / 4) mask |= (byte)(1 << i);
+                if (ratio >= 0.60 + range * i / 4) mask |= (byte)(1 << i);
         byte brightness = progress > 0.5 ? (byte)0 : progress > 0.25 ? (byte)1 : (byte)2;
 
         bool idle = Math.Abs(telemetry.SpeedKmh) < 3 && telemetry.Gas < 0.04 && ratio < 0.30;
@@ -74,7 +78,8 @@ internal sealed class RpmLightEngine
             color.Green + (ice.Green - color.Green) * iceMix,
             color.Blue + (ice.Blue - color.Blue) * iceMix);
 
-        bool shift = ratio >= 0.97 && telemetry.Gear != 0;
+        bool shift = shiftCue.Calibrated ? shiftCue.Active : ratio >= 0.97 && telemetry.Gear != 0;
+        if (shiftCue.ResetEnvelope) _shiftStarted = double.NaN;
         if (!shift) _shiftStarted = double.NaN;
         else if (double.IsNaN(_shiftStarted)) _shiftStarted = _time;
         if (shift && (_time - _shiftStarted) * 3 % 1 >= 0.5) color = default;

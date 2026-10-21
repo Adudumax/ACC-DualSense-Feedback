@@ -227,6 +227,7 @@ internal sealed class FeedbackRuntime : IDisposable
     private void OutputLoop()
     {
         var engine = new CompetitionFeedbackEngine();
+        var shiftCue = new AccShiftCue();
         var lightsEngine = new RpmLightEngine();
         using var lightMetadata = new AccLightingMetadataReader();
         RpmLightFrame lights = RpmLightFrame.Off;
@@ -259,19 +260,23 @@ internal sealed class FeedbackRuntime : IDisposable
                 bool stale = snapshot.ObservedTimestamp == 0 || now - snapshot.ObservedTimestamp > StaleTicks;
                 byte originalLarge = _inputBridge?.LargeMotor ?? 0;
                 byte originalSmall = _inputBridge?.SmallMotor ?? 0;
+                FeedbackTuning tuning = _tuningProvider?.Invoke() ?? FeedbackTuning.Neutral;
+                AccShiftCueState shift = default;
+                if (stale) shiftCue.Reset();
+                else
+                {
+                    lightMetadata.Refresh(now);
+                    shift = shiftCue.Update(snapshot, lightMetadata.CarModel, lightMetadata.MaxRpm, tuning,
+                        lightMetadata.Context.IsPaused, lightMetadata.Context.IsReplay);
+                }
                 FeedbackFrame frame;
                 if (stale)
                 {
                     frame = FeedbackFrame.Off;
                 }
-                else if (_tuningProvider is null)
-                {
-                    frame = engine.Compute(snapshot, now, originalLarge, originalSmall);
-                }
                 else
                 {
-                    FeedbackTuning tuning = _tuningProvider();
-                    frame = engine.Compute(snapshot, now, originalLarge, originalSmall, tuning);
+                    frame = engine.Compute(snapshot, now, originalLarge, originalSmall, tuning, shift);
                 }
                 if (!stale)
                     _capture?.TryWrite(snapshot, originalLarge, originalSmall, frame);
@@ -299,9 +304,8 @@ internal sealed class FeedbackRuntime : IDisposable
                 }
                 else
                 {
-                    lightMetadata.Refresh(now);
                     lights = lightsEngine.Compute(snapshot, now, _lightingProvider(), lightMetadata.MaxRpm,
-                        lightMetadata.Context);
+                        lightMetadata.Context, shift);
                 }
                 if (_dryRun)
                 {

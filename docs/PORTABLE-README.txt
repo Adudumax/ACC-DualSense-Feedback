@@ -1,4 +1,4 @@
-ACC DualSense Feedback 1.1.0
+ACC DualSense Feedback 1.1.2
 ================================
 
 A lightweight companion that adds telemetry-driven DualSense feedback to
@@ -8,7 +8,7 @@ REQUIREMENTS
 
 - Windows 10 or Windows 11, x64
 - Assetto Corsa Competizione for PC
-- DualSense or DualSense Edge connected by USB
+- DualSense or DualSense Edge; USB is recommended, other connections should be tested with your setup
 - ViGEmBus installed
 - Steam Input disabled for ACC
 - DS4Windows fully closed while this application is running
@@ -24,7 +24,7 @@ FIRST USE
 
 1. Extract the complete ZIP to a writable folder. Do not run it inside the ZIP.
 2. Install ViGEmBus if it is not already installed.
-3. Connect the DualSense by USB.
+3. Connect the DualSense.
 4. Close DS4Windows and disable Steam Input for ACC.
 5. Start ACCDualSenseFeedback.exe, then start ACC.
 
@@ -42,6 +42,19 @@ settings; a side set to zero stays off. Grip motors are not
 used. This confirms the output path, not working game telemetry. Process checks,
 first-packet verification and stale-frame clearing remain enabled.
 
+SHIFT REMINDERS
+
+IMPORTANT: Keep "Pulse begins" at its default 96.2% to retain automatic native
+HUD alarm timing for supported cars. Changing it makes R2 use your selected
+RPM percentage and returns lighting to its generic 97% reference; they may no
+longer match the HUD. Right-click the row to restore the default. Use the
+separate strength controls to adjust intensity.
+
+The app has 55 built-in native RPM profiles and matches cars automatically.
+Unknown cars or mismatched RPM limits retain the generic calculation. Matched
+cars do not trigger an automatic upshift alarm in sixth gear. Input forwarding,
+main vibration, base resistance and other feedback mechanisms are retained.
+
 CONTROLLER LIGHTS
 
 Open Advanced settings and scroll to "06 Controller lights". There are only
@@ -50,10 +63,11 @@ the switch and mode selection have short animations.
 
 A running engine has a dim low-RPM floor. Stationary idle breathes ice blue
 (base #5AAFD6); departure fades back to RPM colours. Low-RPM driving keeps a steady
-green floor. Smooth uses HSV hue; Discrete uses
-green/yellow/red stages. All five white LEDs light at 97% of static.maxRpm,
-where RGB flashes at 3 Hz. This is a generic visual cue, not an optimal per-car
-shift point. White-LED hardware brightness adjusts automatically.
+green floor. Smooth uses HSV hue; Discrete uses green/yellow/red stages.
+Supported automatic profiles use the native HUD alarm RPM as the endpoint for
+all five white LEDs and the RGB shift warning. Generic mode uses 97% of maximum
+RPM. RGB shift flashing retains its 3 Hz cadence, so individual flash phases
+need not match the HUD. White-LED hardware brightness adjusts automatically.
 
 ABS feedback vibration while braking at speed triggers a 4 Hz yellow RGB cue.
 Suspected lock requires a learned rolling reference, wheel slowdown and sustained
@@ -64,14 +78,14 @@ flame, TC and flag effects are not included. Full rules and limitations:
 docs/ACC-LIGHTING.zh-CN.md in the source repository.
 
 Settings are saved separately in ACCDualSenseFeedback.lights.json beside the
-EXE. Old disabled/zero-brightness choices stay off. Haptic settings, calibration
-and normal-driving HID send decisions are unchanged; startup adds the single
-confirmation described above. CSP's MIT license is included under licenses.
+EXE. Old disabled/zero-brightness choices stay off. Feedback settings, strength
+calibration and normal-driving HID send decisions are retained. CSP's MIT
+license is included under licenses.
 
 TROUBLESHOOTING
 
-- DualSense unavailable: check the USB cable and HidHide application access.
-- Feedback unavailable: check ViGEmBus, USB and HidHide.
+- DualSense unavailable: check the controller connection and HidHide application access.
+- Feedback unavailable: check ViGEmBus, the controller connection and HidHide.
 - Action needed: close DS4Windows, then select Check again.
 
 Open Diagnostics and logs inside the app and select Copy diagnostic report when
