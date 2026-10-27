@@ -16,7 +16,12 @@ internal sealed record DualSenseDeviceInfo(
     ushort ProductId,
     DualSenseTransport Transport,
     ushort InputReportLength,
-    ushort OutputReportLength);
+    ushort OutputReportLength)
+{
+    // An anonymous per-device key, never a raw HID path or hardware serial in CSV.
+    public string Identity { get; } = Convert.ToHexString(
+        System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Path.ToUpperInvariant())))[..16];
+}
 
 internal sealed class DualSenseHidDevice : IDisposable
 {
@@ -136,6 +141,17 @@ internal sealed class DualSenseHidDevice : IDisposable
             handle.Dispose();
         }
 
+        return null;
+    }
+
+    public static DualSenseHidDevice? TryOpen(DualSenseDeviceInfo info)
+    {
+        // The input owner selected this exact device. Never choose another
+        // controller merely because the output handle failed or reconnected.
+        SafeFileHandle handle = OpenShared(info.Path);
+        if (!handle.IsInvalid)
+            return new DualSenseHidDevice(info, handle);
+        handle.Dispose();
         return null;
     }
 

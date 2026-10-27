@@ -26,7 +26,8 @@ Connect your controller, open the app, and drive. Feedback starts automatically 
 | Adaptive triggers | Progressive L2 brake resistance and a lighter R2 throttle response. |
 | Braking and traction | Distinct ABS, wheel-lock, traction-control and wheelspin cues. |
 | Shifts and engine | Upshift kick, redline pulses and a subtle RPM-linked engine texture. |
-| Road and grip | Directional road and kerb detail, with distinct front/rear grip-loss textures across the two grips. |
+| Road and grip | Directional road and kerb detail, tyre grip textures and rear-slide drag feedback. |
+| Gyro steering | Rotate a USB-connected controller to steer, with adjustable response and stick takeover. |
 | Contact | Impact feedback that responds to the direction and weight of a collision. |
 | Your own feel | A calibrated Default preset plus independent Custom controls and per-parameter reset. |
 
@@ -36,16 +37,16 @@ The app forwards your physical controller through a virtual Xbox 360 controller 
 
 Open **[the latest Release](https://github.com/Adudumax/ACC-DualSense-Feedback/releases/latest)** and choose one Windows x64 ZIP:
 
-- **English:** `ACCDualSenseFeedback-v1.1.2-win-x64-portable.zip`
-- **简体中文:** `ACCDualSenseFeedback-v1.1.2-win-x64-zh-CN-portable.zip`
+- **English:** `ACCDualSenseFeedback-v1.2.0-win-x64-portable.zip`
+- **简体中文:** `ACCDualSenseFeedback-v1.2.0-win-x64-zh-CN-portable.zip`
 
-Both editions use the same feedback engine and calibrated defaults. They are self-contained: no installer or separate .NET installation is required. Extract the ZIP and keep the included `licenses` folder beside the EXE.
+Both editions use the same feedback engine and calibrated defaults. They are self-contained: no installer or separate .NET installation is required. Extract the whole ZIP and keep `ACCGyroFusion.dll` and the included `licenses` folder beside the EXE.
 
 ## ✅ Before you drive
 
 - Windows 10 or Windows 11, **x64**.
 - Assetto Corsa Competizione for PC.
-- DualSense or DualSense Edge. **USB connection is recommended**; please test other connection methods with your setup.
+- DualSense or DualSense Edge connected by **USB**.
 - **ViGEmBus** virtual-controller driver: [download the official release](https://github.com/nefarius/ViGEmBus/releases).
 - Steam Input **disabled for ACC**.
 - If you use DS4Windows, keep it **fully closed** while this app is running.
@@ -70,7 +71,7 @@ The home screen shows the connection state. Once everything is ready, feedback s
 
 ## 🎛️ Default or Custom
 
-Start with **Default** for the calibrated experience. Choose **Custom** or open **Advanced settings** when you want to tune individual cues:
+Start with **Default** for calibrated feedback, Smooth lighting and gyro off. Choose **Custom** or open **Advanced settings** when you want to tune individual cues:
 
 ![Make it your feel — fine-tune each cue from 0 to 100 and reset parameters individually.](docs/assets/github/readme-showcase/custom-modules-en.png)
 
@@ -84,7 +85,16 @@ Strength controls cover **0–100 in one-point steps**. Setting a cue to **0 tur
 
 **Keep Pulse begins at its default 96.2% for automatic native HUD timing on supported cars.** Changing it selects manual R2 timing at **94.0%–99.0% of maximum RPM** and returns lighting to its generic **97%** reference; HUD synchronization is no longer guaranteed. Right-click the row to restore the default. Use the separate strength controls to adjust intensity. Unknown cars retain the generic RPM-based cue.
 
-Custom values are stored beside the EXE in `ACCDualSenseFeedback.settings.json`. Keep that file when moving an already configured copy of the app. English and Chinese editions share the same settings format.
+Custom feedback, lighting and gyro choices are saved beside the EXE. Returning to Default preserves your saved Custom choices. English and Chinese editions share the same settings format.
+
+**Upgrading or moving the app:** close the old copy, extract the new ZIP to a new folder, then copy these files from the old EXE folder if they exist:
+
+- `ACCDualSenseFeedback.settings.json`
+- `ACCDualSenseFeedback.lights.json`
+- `ACCDualSenseFeedback.gyro.json`
+- `ACCDualSenseFeedback.gyro-calibration.json`
+
+Keep the new package's EXE and DLL together. If using HidHide, allow the new EXE path.
 
 ## 🩺 Diagnostics & troubleshooting
 
@@ -106,6 +116,18 @@ The app does not install drivers automatically. If ViGEmBus is missing or anothe
 ## 📝 Release notes
 
 See **[Release notes](RELEASE_NOTES.md)** for the current version's highlights, requirements and known limitations.
+
+## 🎮 Gyro steering (USB)
+
+1. Choose **Custom → Advanced settings → 07 Gyro steering → Adjust settings**, then enable gyro.
+2. On first use, pause ACC and complete **Stationary calibration** with the controller resting still.
+3. Hold the controller naturally, select **Set straight ahead**, then return to ACC and drive.
+
+Stationary calibration is saved for each controller. **Set straight ahead each time you start the app or reconnect the controller.** This sets your current grip; it does not repeat stationary calibration.
+
+Adjust steering angle, deadzone, response curve and stabilization to taste. Continuous mode resumes automatically when you return to driving; an intentional manual pause still needs the bound button or **Resume gyro**. Hold and Toggle modes follow their selected button behavior. Moving the physical stick can take over steering.
+
+Keep `ACCGyroFusion.dll` beside the EXE. Gyro steering uses USB and is off in Default.
 
 ## 📄 License & acknowledgements
 

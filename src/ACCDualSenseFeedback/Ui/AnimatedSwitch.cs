@@ -39,11 +39,11 @@ public sealed class AnimatedSwitch : ToggleButton
         Color color = (Color)FindResource(IsChecked == true ? "Color.Brand" : "Color.BorderStrong");
         if (animate && SystemParameters.ClientAreaAnimation)
         {
-            var easing = new QuadraticEase { EasingMode = EasingMode.EaseOut };
+            var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
             _thumb.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(target,
-                TimeSpan.FromMilliseconds(160)) { EasingFunction = easing });
+                TimeSpan.FromMilliseconds(190)) { EasingFunction = easing });
             _track.BeginAnimation(SolidColorBrush.ColorProperty,
-                new ColorAnimation(color, TimeSpan.FromMilliseconds(160)));
+                new ColorAnimation(color, TimeSpan.FromMilliseconds(190)) { EasingFunction = easing });
         }
         else
         {

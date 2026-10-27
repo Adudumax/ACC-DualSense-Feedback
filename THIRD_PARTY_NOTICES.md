@@ -31,6 +31,25 @@ Source: https://github.com/nefarius/ViGEm.NET<br>
 NuGet: https://www.nuget.org/packages/Nefarius.ViGEm.Client/1.21.256<br>
 License: MIT; reproduced in `licenses/VIGEM-NET-LICENSE.txt`.
 
+## Gyro sensor fusion
+
+`ACCGyroFusion.dll` contains GamepadMotionHelpers version 10, fixed at commit
+`f1a76007ec058122a4bb6f19c816c6c0c7b7f12a`, with this project's C ABI wrapper.
+The upstream header is kept unmodified in `native/vendor/GamepadMotionHelpers`.
+
+Source: https://github.com/JibbSmart/GamepadMotionHelpers<br>
+License: MIT, Copyright (c) 2020-2023 Julian "Jibb" Smart; reproduced in
+`licenses/GAMEPAD-MOTION-HELPERS-LICENSE.txt`.
+
+The Windows x64 helper is built with LLVM MinGW; its statically linked LLVM
+support code retains the Apache 2.0 with LLVM Exceptions terms reproduced in
+`licenses/LLVM-RUNTIME-LICENSE.txt`. The development compiler is not distributed.
+The DLL uses only Windows system DLLs at runtime.
+
+DualSense IMU report parsing and factory calibration are independently implemented
+from the protocol layout and conversion formulas documented in SDL's PS5 driver:
+https://github.com/libsdl-org/SDL/blob/main/src/joystick/hidapi/SDL_hidapi_ps5.c
+
 ## Chinese UI font (zh-CN builds only)
 
 The Simplified Chinese build embeds subsets of Noto Sans SC, instantiated at

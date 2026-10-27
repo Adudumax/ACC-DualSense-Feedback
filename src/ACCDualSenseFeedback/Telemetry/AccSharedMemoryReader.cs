@@ -7,6 +7,7 @@ internal unsafe sealed class AccSharedMemoryReader : IDisposable
 {
     internal const int PhysicsPageSize = 800;
     private static readonly string[] MapNames = [@"Local\acpmf_physics", "acpmf_physics"];
+    private readonly string[] _mapNames;
 
     private MemoryMappedFile? _mapping;
     private MemoryMappedViewAccessor? _view;
@@ -15,12 +16,16 @@ internal unsafe sealed class AccSharedMemoryReader : IDisposable
 
     public bool IsConnected => _pointer != null;
 
+    public AccSharedMemoryReader() : this(MapNames) { }
+
+    internal AccSharedMemoryReader(string[] mapNames) => _mapNames = mapNames;
+
     public bool TryConnect()
     {
         if (IsConnected)
             return true;
 
-        foreach (string name in MapNames)
+        foreach (string name in _mapNames)
         {
             try
             {
@@ -80,12 +85,15 @@ internal unsafe sealed class AccSharedMemoryReader : IDisposable
         snapshot.LocalAngularVelocityX = page->LocalAngularVelocity[0];
         snapshot.LocalAngularVelocityY = page->LocalAngularVelocity[1];
         snapshot.LocalAngularVelocityZ = page->LocalAngularVelocity[2];
-        // Tc/Abs are the configured assist levels, not live intervention.
-        // Only the *InAction fields are suitable as event signals.
+        // Retain these baseline mirrors for unrelated tyre learning, wheelspin,
+        // ABS and existing diagnostic columns. They are not a TC event source:
+        // ACC v1.8.12 marks integer TcInAction as unused, and physics float Tc
+        // is an intervention value, not the configured graphics-page TC level.
         snapshot.TcLevel = page->Tc;
         snapshot.AbsLevel = page->Abs;
         snapshot.Tc = page->TcInAction != 0 ? 1f : 0f;
         snapshot.Abs = page->AbsInAction != 0 ? 1f : 0f;
+        snapshot.TcIntervention = float.IsFinite(page->Tc) ? Math.Clamp(page->Tc, 0f, 1f) : 0f;
         snapshot.LocalYawRate = snapshot.LocalAngularVelocityY;
         snapshot.FinalFf = page->FinalFf;
         snapshot.KerbVibration = page->KerbVibration;

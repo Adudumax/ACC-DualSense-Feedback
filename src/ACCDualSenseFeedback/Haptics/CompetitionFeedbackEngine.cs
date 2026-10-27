@@ -23,7 +23,10 @@ internal sealed class CompetitionFeedbackEngine
     private long _lastUpdate;
     private float _absEnvelope;
     private float _lockEnvelope;
-    private float _tcEnvelope;
+    private float _tcEnvelope; // Baseline background priority only; never a TC vibration source.
+    private TractionFeedbackState _tractionFeedback;
+    private RearDragFeedbackState _rearDragFeedback;
+    internal RearDragCueFrame RearDragCue { get; private set; }
     private float _wheelspinEnvelope;
     private float _redlineEnvelope;
     private float _shiftEnvelope;
@@ -169,6 +172,19 @@ internal sealed class CompetitionFeedbackEngine
         _redlineEnvelope = FollowEnvelope(_redlineEnvelope, redline, deltaSeconds, 0.052f, 0.110f);
         _shiftEnvelope = FollowEnvelope(_shiftEnvelope, shiftTarget, deltaSeconds, 0.010f, 0.052f);
 
+        // Mechanical drive-wheel spin is longitudinal, never side-slip. It can
+        // coexist with TC; the real intervention owns R2 when both are enabled.
+        // Keep the legacy envelopes above solely for stable background mixing.
+        float drivenWheelSpeed = MathF.Max(MathF.Abs(FiniteOrZero(t.WheelAngularSpeedRl)),
+            MathF.Abs(FiniteOrZero(t.WheelAngularSpeedRr)));
+        float tractionMotion = MathF.Max(SmoothStep(1f, 12f, MathF.Abs(t.SpeedKmh)),
+            SmoothStep(2f, 12f, drivenWheelSpeed));
+        float wheelspinEventTarget = rearLongitudinalSlip * tractionMotion
+            * SmoothStep(.06f, .35f, gas) * (1f - SmoothStep(.12f, .45f, brake));
+        TractionCueFrame traction = _tractionFeedback.Update(t, wheelspinEventTarget,
+            tuning.TcPulseScale, tuning.WheelspinPulseScale, deltaSeconds, now,
+            _shiftEnvelope > .06f && tuning.ShiftKickScale > 0f);
+
         UpdateWheelDynamics(t, deltaSeconds, speedFade);
         UpdateSlipEnvelopes(t, deltaSeconds, speedFade);
         UpdateImpactDetector(t, now);
@@ -176,21 +192,20 @@ internal sealed class CompetitionFeedbackEngine
         float absCue = tuning.AbsPulseScale > 0f ? _absEnvelope : 0f;
         float lockCue = tuning.LockPulseScale > 0f ? _lockEnvelope : 0f;
         TriggerEffect leftTrigger = absCue >= lockCue
-            ? BuildEventPedal(
-                BrakeZones,
+            ? BrakePedalFeedback.BuildAbs(
                 tuning.BrakeResistanceScale,
                 absCue,
-                tuning.AbsPulseScale,
-                2, 2, 5, 15)
-            : BuildEventPedal(
+                tuning.AbsPulseScale)
+            : lockCue >= 0.035f ? BuildEventPedal(
                 BrakeZones,
                 tuning.BrakeResistanceScale,
                 lockCue,
                 tuning.LockPulseScale,
-                2, 2, 6, 8);
+                2, 2, 6, 8)
+            : BrakePedalFeedback.CreateResistance(tuning.BrakeResistanceScale);
 
-        float tcCue = tuning.TcPulseScale > 0f ? _tcEnvelope : 0f;
-        float wheelspinCue = tuning.WheelspinPulseScale > 0f ? _wheelspinEnvelope : 0f;
+        float tcCue = traction.TcStrength;
+        float wheelspinCue = traction.WheelspinStrength;
         float redlineCue = tuning.RedlinePulseScale > 0f ? _redlineEnvelope : 0f;
         TriggerEffect rightTrigger;
         if (_shiftEnvelope > 0.06f && tuning.ShiftKickScale > 0f)
@@ -200,13 +215,9 @@ internal sealed class CompetitionFeedbackEngine
                 _shiftEnvelope,
                 tuning.ShiftKickScale,
                 1, 2, 5, 28);
-        else if (tcCue >= wheelspinCue && tcCue >= redlineCue * 0.85f)
-            rightTrigger = BuildEventPedal(
-                ThrottleZones,
-                tuning.ThrottleResistanceScale,
-                tcCue,
-                tuning.TcPulseScale,
-                2, 1, 4, 12);
+        else if (tcCue >= .035f)
+            rightTrigger = BuildEventPedal(ThrottleZones, tuning.ThrottleResistanceScale,
+                tcCue, tuning.TcPulseScale, 2, 1, 4, 40);
         else if (wheelspinCue >= redlineCue * 0.85f)
             rightTrigger = BuildEventPedal(
                 ThrottleZones,
@@ -255,6 +266,10 @@ internal sealed class CompetitionFeedbackEngine
         float strongestSurface = MathF.Max(_surfaceLeftEnvelope, _surfaceRightEnvelope);
         float strongestSlip = Max4(_slipEnvelope[0], _slipEnvelope[1], _slipEnvelope[2], _slipEnvelope[3]);
         float informationCue = MathF.Max(strongestSurface, strongestSlip);
+
+        // A brief entry confirmation, never a tyre-triggered TC substitute.
+        // Strong tyre/road signals do not mute it or change any stable gain.
+        float tcStandalone = traction.TcGripPulse;
 
         // Track ACC's slow native component so an unlabeled transient can be
         // removed from the wrong side and re-routed during a spatial event.
@@ -412,6 +427,25 @@ internal sealed class CompetitionFeedbackEngine
             out float engineRight);
         leftOutput = SoftCombine(leftOutput, engineLeft);
         rightOutput = SoftCombine(rightOutput, engineRight);
+
+        // Add TC only after all stable layers and the original engine-room
+        // calculation. It cannot lower tyre gain or reserve extra engine room.
+        // The masks affect only TC and preserve existing one-sided information.
+        if (tcStandalone > 0f)
+        {
+            leftOutput = SoftCombine(leftOutput, tcStandalone * 0.12f * (1f - rightIsolation));
+            rightOutput = SoftCombine(rightOutput, tcStandalone * 0.16f * (1f - leftIsolation));
+        }
+
+        // Only a confirmed rear slide adds the original tcgrip.4 + griploss.1
+        // rear-drag voice. No new front voice, tyre replacement, ownership or
+        // headroom changes. Inactive events leave the exact baseline path.
+        RearDragCue = _rearDragFeedback.Update(t, tuning.GripLossScale, deltaSeconds, now);
+        if (RearDragCue.Left > 0f || RearDragCue.Right > 0f)
+        {
+            leftOutput = SoftCombine(leftOutput, RearDragCue.Left);
+            rightOutput = SoftCombine(rightOutput, RearDragCue.Right);
+        }
 
         // A collision must read as a distinct hit instead of another continuous
         // rumble layer. Briefly reserve headroom, then add the directionally

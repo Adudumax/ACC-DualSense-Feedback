@@ -1,6 +1,6 @@
 param(
     [ValidatePattern('^\d+\.\d+\.\d+(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?$')]
-    [string]$Version = '1.1.2',
+    [string]$Version = '1.2.0',
 
     [string]$OutputRoot = '',
 
@@ -32,6 +32,11 @@ if (Test-Path -LiteralPath $releaseRoot) {
     throw "Release output already exists: $releaseRoot. Preserve it or move it before rebuilding."
 }
 
+$gyroNativePath = Join-Path $repositoryRoot 'native\bin\win-x64\ACCGyroFusion.dll'
+if (-not (Test-Path -LiteralPath $gyroNativePath -PathType Leaf)) {
+    throw 'Gyro fusion DLL is missing. Build native/ first before packaging the gyro release.'
+}
+
 New-Item -ItemType Directory -Path $portablePath -Force | Out-Null
 
 & dotnet publish $projectPath `
@@ -59,10 +64,13 @@ if (-not (Test-Path -LiteralPath $executablePath -PathType Leaf)) {
 
 $requiredRelativePaths = @(
     'ACCDualSenseFeedback.exe',
+    'ACCGyroFusion.dll',
     'licenses\ACC-DUALSENSE-FEEDBACK-LICENSE.txt',
     'licenses\THIRD_PARTY_NOTICES.md',
     'licenses\VIGEM-NET-LICENSE.txt',
-    'licenses\CSP-LUA-INTERNAL-LICENSE.txt'
+    'licenses\CSP-LUA-INTERNAL-LICENSE.txt',
+    'licenses\GAMEPAD-MOTION-HELPERS-LICENSE.txt',
+    'licenses\LLVM-RUNTIME-LICENSE.txt'
 )
 $requiredRelativePaths += if ($Language -eq 'zh-CN') {
     $chineseReadmeName = (-join @(

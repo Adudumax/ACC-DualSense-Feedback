@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using ACCDualSenseFeedback.Lighting;
+using ACCDualSenseFeedback.Haptics;
 using ACCDualSenseFeedback.Runtime;
 
 namespace ACCDualSenseFeedback.Ui;
@@ -21,7 +22,7 @@ public partial class MainWindow
 
     private void LightingOptionChanged(object sender, RoutedEventArgs e)
     {
-        if (_updatingLighting || _closing) return;
+        if (_updatingLighting || _closing || _profile.ActivePreset != FeedbackPreset.Custom) return;
         CommitLighting(_lightSettingsState.Current with { Enabled = LightsEnabledSwitch.IsChecked == true });
     }
 
@@ -32,7 +33,7 @@ public partial class MainWindow
 
     private void CommitLighting(RpmLightSettings settings)
     {
-        if (_updatingLighting || _closing) return;
+        if (_updatingLighting || _closing || _profile.ActivePreset != FeedbackPreset.Custom) return;
         _lightSettingsState.Update(settings);
         UpdateLightingControls(true);
         _lightSaveCancellation?.Cancel();
@@ -43,10 +44,17 @@ public partial class MainWindow
 
     private void UpdateLightingControls(bool animate)
     {
-        RpmLightSettings settings = _lightSettingsState.Current;
+        bool custom = _profile.ActivePreset == FeedbackPreset.Custom;
+        RpmLightSettings settings = custom ? _lightSettingsState.Current : RpmLightSettings.Default;
+        _updatingLighting = true;
+        LightsEnabledSwitch.IsChecked = settings.Enabled;
+        LightsEnabledSwitch.IsEnabled = custom;
+        LightingPresetHint.Text = UiText.Get(custom
+            ? "RPM, idle and braking cues" : "Switch to Custom to adjust.");
+        _updatingLighting = false;
         bool smooth = settings.Mode == RpmLightMode.Smooth;
-        LightModeOptions.IsEnabled = settings.Enabled;
-        LightModeOptions.Opacity = settings.Enabled ? 1 : 0.45;
+        LightModeOptions.IsEnabled = custom && settings.Enabled;
+        LightModeOptions.Opacity = custom && settings.Enabled ? 1 : 0.45;
         SmoothLightLabel.Foreground = FindBrush(smooth ? "Brush.Window" : "Brush.TextSecondary");
         DiscreteLightLabel.Foreground = FindBrush(smooth ? "Brush.TextSecondary" : "Brush.Window");
         double target = smooth ? 0 : 100;

@@ -166,11 +166,12 @@ internal static class ShiftCueChecks
         check("Existing TC and shift-kick arbitration still takes priority over calibrated redline when qualified", () =>
         {
             var cue = new AccShiftCue(); var engine = new CompetitionFeedbackEngine(); var car = Car(8000);
-            car.Tc = 1; car.TcLevel = 1;
+            car.Tc = 1; car.TcLevel = 1; car.TcIntervention = 1;
             FeedbackFrame frame = default;
             for (int i = 0; i < 200; i++) frame = engine.Compute(car, At(i * .004), 0, 0, Tuning, Update(cue, car));
-            Assert(frame.RightTrigger.Mode == 0x26 && frame.RightTrigger.P8 == 12, "TC arbitration changed");
-            car.Gear++; car.Tc = 0; car.Rpm = 7400;
+            Assert(frame.RightTrigger.Mode == 0x26 && frame.RightTrigger.P8 == 40,
+                "qualified TC vibration did not retain priority over calibrated redline");
+            car.Gear++; car.Tc = 0; car.TcIntervention = 0; car.Rpm = 7400;
             frame = engine.Compute(car, At(.8), 0, 0, Tuning, Update(cue, car));
             Assert(frame.RightTrigger.Mode == 0x26 && frame.RightTrigger.P8 == 28, "shift kick replaced");
             for (int i = 201; i < 350; i++) frame = engine.Compute(car, At(i * .004), 0, 0, Tuning, Update(cue, car));

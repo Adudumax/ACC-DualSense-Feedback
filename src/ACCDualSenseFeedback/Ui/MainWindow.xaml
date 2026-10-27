@@ -176,6 +176,7 @@
                         </StackPanel>
 
                         <ScrollViewer
+                            x:Name="SettingsScrollViewer"
                             Grid.Row="2"
                             Margin="0,14,-12,10"
                             Padding="0,0,12,8"
@@ -316,7 +317,7 @@
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterLabelWidth}" /><ColumnDefinition /><ColumnDefinition Width="{x:Static ui:UiTypography.ParameterValueWidth}" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock FontSize="{x:Static ui:UiTypography.ParameterSize}" FontWeight="{x:Static ui:UiTypography.ParameterWeight}" Text="{ui:Translate Text=&quot;Wheelspin warning&quot;}" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;R2 · TC off&quot;}" />
+                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;R2 · driven-wheel spin&quot;}" />
                                     </StackPanel>
                                     <Slider x:Name="WheelspinPulseSlider" Grid.Column="1" Style="{StaticResource Slider.Compact}" AutomationProperties.Name="{ui:Translate Text=&quot;Wheelspin warning strength&quot;}" AutomationProperties.HelpText="{ui:Translate Text=&quot;Set to zero to turn off. Right-click to reset to 50.&quot;}" />
                                     <TextBlock x:Name="WheelspinPulseValue" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Type.ParameterReadout}" Text="{ui:Translate Text=&quot;50 · Standard&quot;}" />
@@ -377,7 +378,7 @@
                                     <TextBlock VerticalAlignment="Top" Margin="0,3,0,0" FontFamily="{StaticResource Font.Latin}" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="06" />
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock FontSize="14" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Controller lights&quot;}" />
-                                        <TextBlock Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;RPM, idle and braking cues · saved separately&quot;}" />
+                                        <TextBlock x:Name="LightingPresetHint" Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Switch to Custom to adjust.&quot;}" />
                                     </StackPanel>
                                     <ui:AnimatedSwitch x:Name="LightsEnabledSwitch" Grid.Column="2" Style="{StaticResource Switch.Lighting}" Checked="LightingOptionChanged" Unchecked="LightingOptionChanged" AutomationProperties.Name="{ui:Translate Text=&quot;Enable controller lights&quot;}" />
                                 </Grid>
@@ -400,6 +401,24 @@
                                         </Grid>
                                     </Grid>
                                 </Grid>
+                                <Border Height="1" Margin="0,14,0,12" Background="{DynamicResource Brush.BorderStrong}" />
+                                <Button x:Name="GyroEntryButton" Style="{StaticResource Button.GyroEntry}" Click="GyroSettingsButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Gyro steering settings&quot;}">
+                                    <Grid x:Name="GyroSection" MinHeight="76">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="31" /><ColumnDefinition /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <TextBlock Margin="0,21,0,0" VerticalAlignment="Top" FontFamily="{StaticResource Font.Latin}" Foreground="{DynamicResource Brush.Brand}" FontSize="10.5" FontWeight="Bold" Text="07" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock FontSize="14" FontWeight="SemiBold" Text="{ui:Translate Text=&quot;Gyro steering&quot;}">
+                                                <TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers><DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"><Setter Property="TextDecorations" Value="Underline" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock x:Name="GyroPresetHint" Margin="0,2,0,0" Style="{StaticResource Type.Caption}" Text="{ui:Translate Text=&quot;Rotate the controller to steer.&quot;}" />
+                                        </StackPanel>
+                                        <TextBlock x:Name="GyroEntryState" Grid.Column="2" Margin="12,0,16,0" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource Brush.TextSecondary}" Text="{ui:Translate Text=&quot;Off&quot;}" />
+                                        <StackPanel Grid.Column="3" VerticalAlignment="Center" Orientation="Horizontal">
+                                            <TextBlock FontSize="12" FontWeight="Medium" VerticalAlignment="Center" Text="{ui:Translate Text=&quot;Adjust settings&quot;}" />
+                                            <TextBlock Margin="8,0,0,0" FontFamily="{StaticResource Font.Latin}" FontSize="20" Text="›" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
                             </StackPanel>
                         </ScrollViewer>
 
@@ -417,6 +436,39 @@
                                 Content="{ui:Translate Text=&quot;Reset all&quot;}"
                                 Click="ResetFeedbackButton_Click"
                                 AutomationProperties.Name="{ui:Translate Text=&quot;Reset all feedback modules&quot;}" />
+                        </Grid>
+                    </Grid>
+
+                    <Grid x:Name="GyroPanelContent" Margin="55,23,44,25" Background="{DynamicResource Brush.Canvas}" Opacity="0" Visibility="Collapsed" Panel.ZIndex="5">
+                        <Grid.RenderTransform><TranslateTransform x:Name="GyroPanelTranslate" /></Grid.RenderTransform>
+                        <Grid.RowDefinitions><RowDefinition Height="28" /><RowDefinition Height="46" /><RowDefinition Height="44" /><RowDefinition Height="32" /><RowDefinition Height="38" /><RowDefinition Height="*" /><RowDefinition Height="32" /></Grid.RowDefinitions>
+                        <Grid>
+                            <Button Width="72" Height="28" HorizontalAlignment="Left" Style="{StaticResource Button.Inline}" Content="{ui:Translate Text=&quot;‹  Back&quot;}" Click="GyroBackButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Back to advanced settings&quot;}" />
+                            <TextBlock x:Name="GyroPresetCaption" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource Brush.TextTertiary}" Text="{ui:Translate Text=&quot;Custom preset&quot;}" />
+                        </Grid>
+                        <TextBlock Grid.Row="1" Margin="0,4,0,0" Style="{StaticResource Type.PageTitle}" Text="{ui:Translate Text=&quot;Gyro steering&quot;}" />
+                        <Border Grid.Row="2" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center" FontSize="14" FontWeight="Medium" Text="{ui:Translate Text=&quot;Enable gyro steering&quot;}" />
+                                <TextBlock x:Name="GyroMasterState" Grid.Column="1" Margin="0,0,12,0" VerticalAlignment="Center" FontSize="12" Text="{ui:Translate Text=&quot;Off&quot;}" />
+                                <ui:AnimatedSwitch x:Name="GyroPageEnabledSwitch" Grid.Column="2" Style="{StaticResource Switch.Lighting}" Checked="GyroEnabled_Changed" Unchecked="GyroEnabled_Changed" AutomationProperties.Name="{ui:Translate Text=&quot;Enable gyro steering&quot;}" />
+                            </Grid>
+                        </Border>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <TextBlock x:Name="GyroPageHint" VerticalAlignment="Center" FontSize="12" LineHeight="16" Foreground="{DynamicResource Brush.TextSecondary}" TextWrapping="Wrap" Text="{ui:Translate Text=&quot;Switch to Custom to adjust.&quot;}" />
+                            <Button x:Name="GyroStatusAction" Grid.Column="1" Margin="12,0,0,0" Style="{StaticResource Button.GyroStatus}" Visibility="Collapsed" Click="GyroStatusAction_Click" />
+                        </Grid>
+                        <Grid x:Name="GyroTabsHost" Grid.Row="4" />
+                        <ScrollViewer x:Name="GyroScrollViewer" Grid.Row="5" Margin="0,4,-12,4" Padding="0,0,12,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" PanningMode="VerticalOnly">
+                            <ScrollViewer.Resources><Style TargetType="ScrollBar" BasedOn="{StaticResource ScrollBar.Module}" /></ScrollViewer.Resources>
+                            <StackPanel x:Name="GyroControlsHost" />
+                        </ScrollViewer>
+                        <Grid Grid.Row="6">
+                            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <TextBlock x:Name="GyroSaveCaption" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource Brush.TextTertiary}" Text="{ui:Translate Text=&quot;Changes save automatically · Right-click to reset a parameter.&quot;}" />
+                            <Button x:Name="ResetGyroButton" Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource Button.Inline}" Content="{ui:Translate Text=&quot;Reset steering&quot;}" Click="ResetGyroButton_Click" AutomationProperties.Name="{ui:Translate Text=&quot;Reset steering parameters&quot;}" />
                         </Grid>
                     </Grid>
 

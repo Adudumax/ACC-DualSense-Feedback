@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime;
 using ACCDualSenseFeedback.Diagnostics;
+using ACCDualSenseFeedback.Gyro;
 using ACCDualSenseFeedback.Haptics;
 using ACCDualSenseFeedback.Hardware.DualSense;
 using ACCDualSenseFeedback.Runtime;
@@ -14,6 +15,7 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        GyroSettingsState.Current = PortableGyroSettingsStore.Load();
         if (args.Length == 0 || args.Contains("--gui", StringComparer.OrdinalIgnoreCase))
             return RunDesktop();
 
@@ -51,6 +53,12 @@ internal static class Program
 
         bool dryRun = args.Contains("--dry-run", StringComparer.OrdinalIgnoreCase);
         bool captureTelemetry = args.Contains("--capture-telemetry", StringComparer.OrdinalIgnoreCase);
+        bool captureBrake = args.Contains("--capture-brake", StringComparer.OrdinalIgnoreCase);
+        if (captureBrake && captureTelemetry)
+        {
+            Console.Error.WriteLine("Choose brake support capture or full telemetry capture for this run.");
+            return 2;
+        }
         if (!dryRun && Process.GetProcessesByName("DS4Windows").Length != 0)
         {
             Console.Error.WriteLine("DS4Windows is running. Exit it before starting this app to avoid duplicate virtual controllers and competing output reports.");
@@ -63,7 +71,7 @@ internal static class Program
         string? capturePath = captureTelemetry
             ? Path.Combine(AppContext.BaseDirectory, $"ACC-telemetry-{DateTime.Now:yyyyMMdd-HHmmss}.csv")
             : null;
-        string mode = dryRun ? "DRY RUN" : captureTelemetry ? "CAPTURE" : "LIVE";
+        string mode = dryRun ? "DRY RUN" : captureBrake ? "BRAKE CAPTURE" : captureTelemetry ? "CAPTURE" : "LIVE";
         ConsoleUi.Initialize(mode, capturePath);
         if (dryRun)
             ConsoleUi.Notice("HID output disabled", "Telemetry and feedback calculations run without writing to the controller.");
@@ -75,10 +83,37 @@ internal static class Program
             stop.Cancel();
         };
 
-        using var runtime = new FeedbackRuntime(dryRun, capturePath);
+        FeedbackProfile consoleProfile = PortableProfileStore.Load(out _);
+        var consoleLights = PortableLightSettingsStore.Load(out _);
+        BrakeSupportCapture? brakeCapture = null;
         try
         {
+            if (captureBrake)
+            {
+                string brakeDirectory = Path.Combine(AppContext.BaseDirectory, "BrakeSupportRecords",
+                    $"{DateTime.Now:yyyyMMdd-HHmmss-fff}-{Guid.NewGuid().ToString("N")[..6]}");
+                brakeCapture = new BrakeSupportCapture(brakeDirectory);
+                ConsoleUi.Notice("Brake support capture",
+                    $"Drive normally and brake several times, then press Ctrl+C. Settings are unchanged. Records: {brakeDirectory}");
+            }
+            using var runtime = new FeedbackRuntime(dryRun, capturePath,
+                tuningProvider: () => consoleProfile.ToTuning(),
+                lightingProvider: () => consoleLights,
+                customPresetProvider: () => consoleProfile.ActivePreset == FeedbackPreset.Custom,
+                gyroSettingsProvider: () => GyroSettingsState.Current,
+                brakeSupportCapture: brakeCapture);
             runtime.Run(stop.Token);
+            brakeCapture?.Dispose();
+            if (brakeCapture is not null)
+            {
+                if (!brakeCapture.Completed || brakeCapture.Failure is not null)
+                {
+                    ConsoleUi.Error("Brake capture incomplete",
+                        $"{brakeCapture.Failure?.Message ?? "The writer did not finish."} Records: {brakeCapture.DirectoryPath}");
+                    return 5;
+                }
+                ConsoleUi.Ready("Brake report saved", brakeCapture.DirectoryPath);
+            }
             if (runtime.BackgroundFailure is null)
                 ConsoleUi.Ready("Stopped safely", "Motors and adaptive triggers were cleared.");
             return runtime.BackgroundFailure is null ? 0 : 4;
@@ -89,6 +124,10 @@ internal static class Program
                 "Startup failed",
                 $"{exception.Message} Check USB, the HidHide application list and ViGEmBus.");
             return 4;
+        }
+        finally
+        {
+            brakeCapture?.Dispose();
         }
     }
 
@@ -140,7 +179,7 @@ internal static class Program
         var frame = new FeedbackFrame(
             0,
             0,
-            TriggerEffect.FeedbackZones(3, 4, 4, 5, 5, 6, 6, 7, 7, 8),
+            BrakePedalFeedback.CreateResistance(1f),
             TriggerEffect.FeedbackZones(2, 2, 2, 3, 3, 3, 4, 4, 5, 5));
 
         if (!device.TryWrite(frame))

@@ -18,3 +18,7 @@ ACCDualSenseFeedback.settings.json
 ACCDualSenseFeedback.settings.json.tmp
 ACCDualSenseFeedback.lights.json
 ACCDualSenseFeedback.lights.json.tmp
+ACCDualSenseFeedback.gyro.json
+ACCDualSenseFeedback.gyro.json.tmp
+ACCDualSenseFeedback.gyro-calibration.json
+ACCDualSenseFeedback.gyro-calibration.json.tmp

@@ -41,6 +41,36 @@ internal readonly record struct TriggerEffect(
             frequency);
     }
 
+    public static TriggerEffect VibrationZones(ReadOnlySpan<byte> amplitudes, byte frequency)
+    {
+        if (amplitudes.Length < 10)
+            throw new ArgumentException("Ten trigger zones are required.", nameof(amplitudes));
+        if (frequency == 0)
+            return Off;
+
+        ushort active = 0;
+        uint packed = 0;
+        for (int index = 0; index < 10; index++)
+        {
+            int amplitude = Math.Clamp((int)amplitudes[index], 0, 8);
+            if (amplitude == 0)
+                continue;
+            active |= (ushort)(1 << index);
+            packed |= (uint)(amplitude - 1) << (index * 3);
+        }
+        return active == 0 ? Off : new TriggerEffect(
+            0x26,
+            (byte)active,
+            (byte)(active >> 8),
+            (byte)packed,
+            (byte)(packed >> 8),
+            (byte)(packed >> 16),
+            (byte)(packed >> 24),
+            0,
+            0,
+            frequency);
+    }
+
     public static TriggerEffect FeedbackZones(
         byte z0, byte z1, byte z2, byte z3, byte z4,
         byte z5, byte z6, byte z7, byte z8, byte z9)

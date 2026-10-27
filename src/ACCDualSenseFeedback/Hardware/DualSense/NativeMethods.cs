@@ -12,6 +12,7 @@ internal static unsafe partial class NativeMethods
     internal const uint FileShareRead = 0x00000001;
     internal const uint FileShareWrite = 0x00000002;
     internal const uint OpenExisting = 3;
+    internal const uint FileFlagOverlapped = 0x40000000;
     internal static readonly IntPtr InvalidHandleValue = new(-1);
 
     [StructLayout(LayoutKind.Sequential)]
@@ -59,6 +60,10 @@ internal static unsafe partial class NativeMethods
     [LibraryImport("hid.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static partial bool HidD_GetAttributes(SafeFileHandle handle, ref HiddAttributes attributes);
+
+    [LibraryImport("hid.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static partial bool HidD_GetFeature(SafeFileHandle handle, byte[] report, uint reportLength);
 
     [LibraryImport("hid.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

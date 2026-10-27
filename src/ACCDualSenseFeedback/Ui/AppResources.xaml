@@ -31,6 +31,8 @@
     <SolidColorBrush x:Key="Brush.BrandHover" Color="{StaticResource Color.BrandHover}" />
     <SolidColorBrush x:Key="Brush.Success" Color="{StaticResource Color.Success}" />
     <SolidColorBrush x:Key="Brush.Warning" Color="{StaticResource Color.Warning}" />
+    <SolidColorBrush x:Key="Brush.GyroReady" Color="#FF3F765C" />
+    <SolidColorBrush x:Key="Brush.GyroAttention" Color="#FF8B5C15" />
 
     <x:Static x:Key="Font.Text" Member="ui:UiTypography.TextFont" />
     <x:Static x:Key="Font.Display" Member="ui:UiTypography.DisplayFont" />
@@ -255,6 +257,51 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="Button.GyroEntry" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+            <Border x:Name="EntrySurface" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsPressed" Value="True"><Setter TargetName="EntrySurface" Property="Opacity" Value="0.75" /></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="Button.GyroStatus" TargetType="Button" BasedOn="{StaticResource Button.Inline}">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style x:Key="Button.GyroAction" TargetType="Button" BasedOn="{StaticResource Button.Inline}">
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="{StaticResource Brush.Surface}" />
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+            <Border x:Name="Surface" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" CornerRadius="7">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ContentPresenter.ContentTemplate><DataTemplate>
+                        <TextBlock Text="{Binding}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                    </DataTemplate></ContentPresenter.ContentTemplate>
+                </ContentPresenter>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.86" /></Trigger>
+                <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.7" /></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Surface" Property="Opacity" Value="0.42" /></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+        <Style.Triggers>
+            <Trigger Property="Tag" Value="Primary"><Setter Property="Background" Value="{StaticResource Brush.TextPrimary}" /><Setter Property="Foreground" Value="{StaticResource Brush.Window}" /></Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="Slider.Decrease" TargetType="RepeatButton">

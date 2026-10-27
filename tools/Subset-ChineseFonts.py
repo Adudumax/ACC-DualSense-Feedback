@@ -7,9 +7,9 @@ from pathlib import Path
 import sys
 
 root = Path(__file__).resolve().parent.parent
-local_dependency = root / "artifacts/zh-cn-build/fonttools"
-if local_dependency.is_dir():
-    sys.path.insert(0, str(local_dependency))
+for local_dependency in (root / "artifacts/zh-cn-build/fonttools", root / "artifacts/gyro-build-deps"):
+    if local_dependency.is_dir():
+        sys.path.insert(0, str(local_dependency))
 
 from fontTools import subset
 from fontTools.ttLib import TTFont

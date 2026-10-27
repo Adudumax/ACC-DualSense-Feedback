@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using ACCDualSenseFeedback.Haptics;
+using ACCDualSenseFeedback.Gyro;
 using ACCDualSenseFeedback.Hardware.DualSense;
 using ACCDualSenseFeedback.Runtime;
 using Microsoft.Win32;
@@ -98,6 +99,19 @@ internal static partial class DiagnosticReportBuilder
         report.AppendLine($"Frames read/written: {value.FramesRead}/{value.FramesWritten}");
         report.AppendLine($"Native rumble large/small: {value.NativeLargeMotor}/{value.NativeSmallMotor}");
         report.AppendLine($"Trigger modes L/R: 0x{value.LeftTriggerMode:X2}/0x{value.RightTriggerMode:X2}");
+        GyroRuntimeStatus gyro = value.Gyro ?? GyroControlState.Current;
+        report.AppendLine();
+        report.AppendLine("[Gyro steering]");
+        report.AppendLine($"Saved custom gyro enabled: {GyroSettingsState.Current.Enabled}");
+        report.AppendLine($"State: {gyro.State}; input source: {gyro.InputSource}");
+        report.AppendLine($"Gyro detail: {gyro.Message}");
+        report.AppendLine($"Input/IMU valid: {gyro.InputValid}/{gyro.ImuValid}");
+        report.AppendLine($"Factory/stationary calibrated: {gyro.FactoryCalibrated}/{gyro.StationaryCalibrated}");
+        report.AppendLine($"Ready: {gyro.Ready}; needs neutral pose: {gyro.NeedsRecenter}");
+        report.AppendLine($"Angle degrees: {gyro.AngleDegrees:F3}; device sample ms: {gyro.DeviceDeltaSeconds * 1000:F3}");
+        report.AppendLine($"Physical/gyro/final X: {gyro.PhysicalX:F4}/{gyro.GyroX:F4}/{gyro.OutputX:F4}");
+        report.AppendLine($"Calibration active/progress: {gyro.IsCalibrating}/{gyro.CalibrationProgress:F3}");
+        report.AppendLine($"Neutral/calibration sequence: {gyro.RecenterSequence}/{gyro.CalibrationSequence}");
     }
 
     private static void AppendDriverStatus(StringBuilder report)

@@ -109,8 +109,22 @@ internal static class Program
         LightingChecks.Run(Check);
         AccLightingChecks.Run(Check);
         StartupConfirmationChecks.Run(Check);
+        BrakeSupportCaptureChecks.Run(Check);
+        BrakeCaptureIntegrationChecks.Run(Check);
+        BrakePedalFeedbackChecks.Run(Check);
         ShiftCueChecks.Run(Check);
-        if (args.Length == 2 && args[0] == "--render-ui") Check("WPF lighting controls render without starting the runtime", () => RenderUi(args[1]));
+        TractionFeedbackChecks.Run(Check);
+        TcTelemetryChecks.Run(Check);
+        GripLossFeedbackChecks.Run(Check);
+        if (args.Length == 3 && args[0] == "--grip-replay")
+            Check("Recorded grip captures preserve stable outputs and identify lateral events", () =>
+                GripLossReplay.Run(args[1], args[2]));
+        GyroCaptureChecks.Run(Check);
+        GyroHardwareChecks.Run(Check);
+        GyroChecks.Run(Check);
+        GyroPauseReasonChecks.Run(Check);
+        GyroStatusUiChecks.Run(Check);
+        if (args.Length == 2 && args[0] == "--render-ui") Check("WPF lighting and gyro controls render without starting the runtime", () => RenderUi(args[1]));
         Console.WriteLine($"{_checks - _failures}/{_checks} checks passed");
         return _failures == 0 ? 0 : 1;
     }
@@ -133,6 +147,11 @@ internal static class Program
             "/ACCDualSenseFeedback;component/Ui/AppResources.xaml", UriKind.RelativeOrAbsolute) });
         var window = new MainWindow(); // Never Show(): Loaded never starts HID/runtime.
         FieldInfo profileField = typeof(MainWindow).GetField("_profile", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var customProfile = ((FeedbackProfile)profileField.GetValue(window)!) with { ActivePreset = FeedbackPreset.Custom };
+        profileField.SetValue(window, customProfile);
+        ((FeedbackProfileState)typeof(MainWindow).GetField("_profileState", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .GetValue(window)!).Update(customProfile);
+        typeof(MainWindow).GetMethod("ApplyProfileVisuals", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(window, [false]);
         object? originalProfile = profileField.GetValue(window);
         var root = (FrameworkElement)window.Content;
         window.Content = null;
@@ -182,6 +201,8 @@ internal static class Program
         Assert(Math.Abs(((TranslateTransform)((Border)toggle.Template.FindName("PART_Thumb", toggle)).RenderTransform).X - 18) < 0.01,
             "switch did not reach its on state");
         ((CancellationTokenSource?)typeof(MainWindow).GetField("_lightSaveCancellation", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(window))?.Cancel();
+        GyroUiChecks.Render(directory, window, root);
+        GyroStatusUiChecks.Render(directory, window, root);
         app.Shutdown();
     }
 }

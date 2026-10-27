@@ -11,6 +11,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using ACCDualSenseFeedback.Diagnostics;
 using ACCDualSenseFeedback.Haptics;
+using ACCDualSenseFeedback.Gyro;
 using ACCDualSenseFeedback.Runtime;
 
 namespace ACCDualSenseFeedback.Ui;
@@ -36,6 +37,7 @@ public partial class MainWindow : Window
     private Exception? _lastRuntimeError;
     private DateTimeOffset? _lastRuntimeErrorAt;
     private string _visualState = string.Empty;
+    private int _pageTransitionVersion;
     private readonly Queue<string> _sessionLog = new();
 
     public MainWindow()
@@ -45,6 +47,7 @@ public partial class MainWindow : Window
         _recoveredFromInvalidSettings = recovered;
         InitializeComponent();
         InitializeLightingControls();
+        InitializeGyroControls();
         ApplyProfileVisuals(animate: false);
         BrakeResistanceSlider.ValueChanged += FeedbackSlider_ValueChanged;
         ThrottleResistanceSlider.ValueChanged += FeedbackSlider_ValueChanged;
@@ -145,7 +148,9 @@ public partial class MainWindow : Window
                     statusSink: OnRuntimeStatus,
                     useConsoleUi: false,
                     tuningProvider: () => _profileState.CurrentTuning,
-                    lightingProvider: () => _lightSettingsState.Current);
+                    lightingProvider: () => _lightSettingsState.Current,
+                    customPresetProvider: () => _profileState.Current.ActivePreset == FeedbackPreset.Custom,
+                    gyroSettingsProvider: () => GyroSettingsState.Current);
                 runtime.Run(cancellationToken);
                 if (runtime.BackgroundFailure is not null)
                     throw new InvalidOperationException(runtime.BackgroundFailure.Message, runtime.BackgroundFailure);
@@ -174,6 +179,7 @@ public partial class MainWindow : Window
             return;
 
         _lastRuntimeStatus = status;
+        UpdateGyroRuntime(status.Gyro ?? GyroControlState.Current);
         bool feedbackLive = status.AccConnected && status.DualSenseConnected && !status.TelemetryStale;
         SetConnectionState(
             status.DualSenseConnected,
@@ -214,7 +220,7 @@ public partial class MainWindow : Window
         ApplyState(
             "live",
             "Feedback active",
-            "DualSense connected. ACC telemetry live.",
+            GyroHomeDetail(),
             FindBrush("Brush.Success"));
     }
 
@@ -408,6 +414,7 @@ public partial class MainWindow : Window
         _profileState.Update(_profile);
         ApplyHomeProfileVisuals(animate: becameCustom);
         UpdateModuleControls();
+        UpdatePresetDependentControls(animate: becameCustom);
         ScheduleProfileSave();
     }
 
@@ -433,6 +440,7 @@ public partial class MainWindow : Window
     {
         ApplyHomeProfileVisuals(animate);
         SyncFeedbackSliders();
+        UpdatePresetDependentControls(animate);
     }
 
     private void SyncFeedbackSliders()
@@ -574,11 +582,20 @@ public partial class MainWindow : Window
         if (target.Visibility == Visibility.Visible)
             return;
 
-        Grid previous = GetVisiblePage();
-        target.BeginAnimation(OpacityProperty, null);
-        target.Opacity = 0;
-        target.Visibility = Visibility.Visible;
+        int transitionVersion = ++_pageTransitionVersion;
+        foreach (Grid page in new[] { LeftPanelContent, SettingsPanelContent, GyroPanelContent, DiagnosticsPanelContent })
+        {
+            page.BeginAnimation(OpacityProperty, null);
+            if (page.RenderTransform is TranslateTransform position)
+            {
+                position.BeginAnimation(TranslateTransform.YProperty, null);
+                position.Y = 0;
+            }
+            page.Visibility = page == target ? Visibility.Visible : Visibility.Collapsed;
+            page.Opacity = page == target ? 1 : 0;
+        }
         SetNavigationState(target);
+        UpdateGyroPreviewSubscription();
 
         if (!SystemParameters.ClientAreaAnimation)
         {
@@ -586,28 +603,27 @@ public partial class MainWindow : Window
             return;
         }
 
-        previous.BeginAnimation(
-            OpacityProperty,
-            new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(120)));
         target.BeginAnimation(
             OpacityProperty,
-            new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180))
+            new DoubleAnimation(.94, 1, TimeSpan.FromMilliseconds(200))
             {
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
             });
         translate.BeginAnimation(
             TranslateTransform.YProperty,
-            new DoubleAnimation(7, 0, TimeSpan.FromMilliseconds(200))
+            new DoubleAnimation(3, 0, TimeSpan.FromMilliseconds(200))
             {
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
             });
 
         await Task.Delay(205);
-        CompletePageTransition(target);
+        if (transitionVersion == _pageTransitionVersion && !_closing) CompletePageTransition(target);
     }
 
     private Grid GetVisiblePage()
-        => DiagnosticsPanelContent.Visibility == Visibility.Visible
+        => GyroPanelContent.Visibility == Visibility.Visible
+            ? GyroPanelContent
+            : DiagnosticsPanelContent.Visibility == Visibility.Visible
             ? DiagnosticsPanelContent
             : SettingsPanelContent.Visibility == Visibility.Visible
                 ? SettingsPanelContent
@@ -615,17 +631,19 @@ public partial class MainWindow : Window
 
     private void CompletePageTransition(Grid target)
     {
-        foreach (Grid page in new[] { LeftPanelContent, SettingsPanelContent, DiagnosticsPanelContent })
+        foreach (Grid page in new[] { LeftPanelContent, SettingsPanelContent, GyroPanelContent, DiagnosticsPanelContent })
         {
             page.BeginAnimation(OpacityProperty, null);
             page.Visibility = page == target ? Visibility.Visible : Visibility.Collapsed;
             page.Opacity = page == target ? 1 : 0;
         }
+        UpdateGyroPreviewSubscription();
     }
 
     private void SetNavigationState(Grid page)
     {
-        AdvancedSettingsButton.Tag = page == SettingsPanelContent ? "Active" : null;
+        if (page != GyroPanelContent) LeaveGyroPage();
+        AdvancedSettingsButton.Tag = page == SettingsPanelContent || page == GyroPanelContent ? "Active" : null;
         DiagnosticsButton.Tag = page == DiagnosticsPanelContent ? "Active" : null;
     }
 
@@ -767,6 +785,13 @@ public partial class MainWindow : Window
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (HandleGyroOverlayKey(e)) return;
+        if (e.Key == Key.Escape && GyroPanelContent.Visibility == Visibility.Visible)
+        {
+            e.Handled = true;
+            _ = ReturnFromGyroAsync();
+            return;
+        }
         if (e.Key == Key.Escape && LeftPanelContent.Visibility != Visibility.Visible)
         {
             e.Handled = true;
@@ -787,6 +812,7 @@ public partial class MainWindow : Window
 
         _closing = true;
         FlushLightingSettingsOnClose();
+        FlushGyroSettingsOnClose();
         _ = Dispatcher.BeginInvoke(
             DispatcherPriority.Background,
             new Action(() => _ = CompleteClosingAsync()));

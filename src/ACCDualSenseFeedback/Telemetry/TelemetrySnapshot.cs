@@ -23,9 +23,12 @@ internal struct TelemetrySnapshot
     public float LocalAngularVelocityX;
     public float LocalAngularVelocityY;
     public float LocalAngularVelocityZ;
-    public float Tc;
+    public float Tc; // Legacy unused-integer mirror; not the TC event signal.
+    // Valid physics float tc; separate from the legacy mirrors below so a TC
+    // fix cannot change the inputs of stable tyre learning or wheelspin logic.
+    public float TcIntervention;
     public float Abs;
-    public float TcLevel;
+    public float TcLevel; // Legacy physics-float mirror, not a configured level.
     public float AbsLevel;
     public float LocalYawRate;
     public float FinalFf;

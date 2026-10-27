@@ -13,10 +13,10 @@
     <TieredCompilation>true</TieredCompilation>
     <AssemblyName>ACCDualSenseFeedback</AssemblyName>
     <RootNamespace>ACCDualSenseFeedback</RootNamespace>
-    <Version>1.1.2</Version>
-    <AssemblyVersion>1.1.2.0</AssemblyVersion>
-    <FileVersion>1.1.2.0</FileVersion>
-    <InformationalVersion>1.1.2</InformationalVersion>
+    <Version>1.2.0</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    <InformationalVersion>1.2.0</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <AssemblyTitle>ACC DualSense Feedback</AssemblyTitle>
     <Product>ACC DualSense Feedback</Product>
@@ -45,6 +45,19 @@
   <ItemGroup>
     <Resource Include="Assets\app-mark.png" />
     <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\native\bin\win-x64\ACCGyroFusion.dll"
+             Link="ACCGyroFusion.dll" CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true"
+             Condition="Exists('..\..\native\bin\win-x64\ACCGyroFusion.dll')" />
+    <Content Include="..\..\native\vendor\GamepadMotionHelpers\LICENSE"
+             Link="licenses\GAMEPAD-MOTION-HELPERS-LICENSE.txt"
+             CopyToPublishDirectory="PreserveNewest"
+             Condition="Exists('..\..\native\vendor\GamepadMotionHelpers\LICENSE')" />
+    <Content Include="..\..\licenses\LLVM-RUNTIME-LICENSE.txt"
+             Link="licenses\LLVM-RUNTIME-LICENSE.txt" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UiLanguage)' == 'zh-CN'">

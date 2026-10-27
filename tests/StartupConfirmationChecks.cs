@@ -19,8 +19,8 @@ internal static class StartupConfirmationChecks
         check("Startup matches stable resting pedal curves and user settings across their full range", () =>
         {
             var standard = Step(new StartupTriggerConfirmation(), 0);
-            Assert(standard.LeftTrigger == TriggerEffect.FeedbackZones(3, 4, 4, 5, 5, 6, 6, 7, 7, 8),
-                "L2 differs from the v1.0.1 resting curve");
+            Assert(standard.LeftTrigger == TriggerEffect.FeedbackZones(3, 4, 4, 5, 6, 6, 7, 7, 8, 8),
+                "L2 differs from the current gameplay resting curve");
             Assert(standard.RightTrigger == TriggerEffect.FeedbackZones(2, 2, 2, 3, 3, 3, 4, 4, 5, 5),
                 "R2 differs from the v1.0.1 resting curve");
             for (int value = 0; value <= 100; value++)

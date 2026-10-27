@@ -11,9 +11,7 @@ internal sealed class StartupTriggerConfirmation
 {
     public static readonly StartupTriggerConfirmation ForProcess = new();
     internal static readonly long DurationTicks = (long)(0.120 * Stopwatch.Frequency);
-    // Match the v1.0.1 resting pedal curves without changing the gameplay engine.
-    private static readonly TriggerEffect BrakeResistance =
-        TriggerEffect.FeedbackZones(3, 4, 4, 5, 5, 6, 6, 7, 7, 8);
+    // L2 uses the gameplay profile; R2 retains its existing resting curve.
     private static readonly TriggerEffect ThrottleResistance =
         TriggerEffect.FeedbackZones(2, 2, 2, 3, 3, 3, 4, 4, 5, 5);
     private bool _consumed;
@@ -51,7 +49,7 @@ internal sealed class StartupTriggerConfirmation
             return normal;
         }
         FeedbackTuning tuning = tuningProvider?.Invoke() ?? FeedbackTuning.Neutral;
-        TriggerEffect left = _leftAllowed ? BuildTrigger(BrakeResistance, tuning.BrakeResistanceScale) : TriggerEffect.Off;
+        TriggerEffect left = _leftAllowed ? BrakePedalFeedback.CreateResistance(tuning.BrakeResistanceScale) : TriggerEffect.Off;
         TriggerEffect right = _rightAllowed ? BuildTrigger(ThrottleResistance, tuning.ThrottleResistanceScale) : TriggerEffect.Off;
         // A side disabled before/during the cue stays disabled for its remainder,
         // even if settings change again inside this short window.

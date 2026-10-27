@@ -1,4 +1,5 @@
 using ACCDualSenseFeedback.Telemetry;
+using ACCDualSenseFeedback.Gyro;
 
 namespace ACCDualSenseFeedback.Runtime;
 
@@ -13,4 +14,5 @@ internal readonly record struct FeedbackRuntimeStatus(
     byte NativeLargeMotor,
     byte NativeSmallMotor,
     int LeftTriggerMode,
-    int RightTriggerMode);
+    int RightTriggerMode,
+    GyroRuntimeStatus? Gyro = null);

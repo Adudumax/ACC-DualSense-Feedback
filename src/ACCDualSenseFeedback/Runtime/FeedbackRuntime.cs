@@ -5,6 +5,7 @@ using ACCDualSenseFeedback.Hardware.DualSense;
 using ACCDualSenseFeedback.Telemetry;
 using ACCDualSenseFeedback.Ui;
 using ACCDualSenseFeedback.Lighting;
+using ACCDualSenseFeedback.Gyro;
 
 namespace ACCDualSenseFeedback.Runtime;
 
@@ -16,8 +17,11 @@ internal sealed class FeedbackRuntime : IDisposable
     private readonly Action<FeedbackRuntimeStatus>? _statusSink;
     private readonly Func<FeedbackTuning>? _tuningProvider;
     private readonly Func<RpmLightSettings> _lightingProvider;
+    private readonly Func<bool> _customPresetProvider;
+    private readonly Func<GyroSteeringSettings> _gyroSettingsProvider;
     private readonly StartupTriggerConfirmation _startupConfirmation;
     private readonly TelemetryCsvCapture? _capture;
+    private readonly BrakeSupportCapture? _brakeSupportCapture;
     private readonly LatestTelemetry _latest = new();
     private readonly AutoResetEvent _telemetryUpdated = new(false);
     private readonly AccSharedMemoryReader _reader = new();
@@ -32,6 +36,8 @@ internal sealed class FeedbackRuntime : IDisposable
     private int _dualSenseConnected;
     private int _accConnected;
     private int _accProbeCompleted;
+    private int _accProcessId;
+    private int _accLive;
     private Exception? _backgroundFailure;
 
     public Exception? BackgroundFailure => Volatile.Read(ref _backgroundFailure);
@@ -43,30 +49,42 @@ internal sealed class FeedbackRuntime : IDisposable
         bool useConsoleUi = true,
         Func<FeedbackTuning>? tuningProvider = null,
         Func<RpmLightSettings>? lightingProvider = null,
-        StartupTriggerConfirmation? startupConfirmation = null)
+        StartupTriggerConfirmation? startupConfirmation = null,
+        Func<bool>? customPresetProvider = null,
+        Func<GyroSteeringSettings>? gyroSettingsProvider = null,
+        BrakeSupportCapture? brakeSupportCapture = null)
     {
         _dryRun = dryRun;
         _useConsoleUi = useConsoleUi;
         _statusSink = statusSink;
-        _tuningProvider = tuningProvider;
+        _brakeSupportCapture = brakeSupportCapture;
+        FeedbackProfile initialProfile = PortableProfileStore.Load(out _);
+        _customPresetProvider = customPresetProvider ?? (() => initialProfile.ActivePreset == FeedbackPreset.Custom);
+        Func<FeedbackTuning> requestedTuning = tuningProvider ?? (() => initialProfile.ToTuning());
+        _tuningProvider = () => _customPresetProvider() ? requestedTuning() : FeedbackTuning.Neutral;
         RpmLightSettings initialLights = PortableLightSettingsStore.Load(out _);
         _lightingProvider = lightingProvider ?? (() => initialLights);
+        GyroSteeringSettings initialGyro = PortableGyroSettingsStore.Load(out _);
+        _gyroSettingsProvider = gyroSettingsProvider ?? (() => initialGyro);
         _startupConfirmation = startupConfirmation ?? StartupTriggerConfirmation.ForProcess;
         _capture = capturePath is null ? null : new TelemetryCsvCapture(capturePath);
     }
 
     public void Run(CancellationToken cancellationToken)
     {
+        _running = true;
         if (!_dryRun)
         {
             _inputBridge = new VirtualXboxBridge(
                 () => _telemetryUpdated.Set(),
-                exception => FailBackgroundThread("input bridge", exception));
+                exception => FailBackgroundThread("input bridge", exception),
+                _gyroSettingsProvider,
+                ReadGyroContext,
+                captureBrakeInput: _brakeSupportCapture is not null);
             if (_useConsoleUi)
                 ConsoleUi.Ready("Controller input", "USB DualSense is bridged to the virtual Xbox 360 controller.");
         }
 
-        _running = true;
         _telemetryThread = new Thread(TelemetryLoop)
         {
             IsBackground = true,
@@ -141,7 +159,8 @@ internal sealed class FeedbackRuntime : IDisposable
                     nativeLargeMotor,
                     nativeSmallMotor,
                     leftTriggerMode,
-                    rightTriggerMode));
+                    rightTriggerMode,
+                    GyroControlState.Current));
                 nextStatus = now + Stopwatch.Frequency;
             }
         }
@@ -164,7 +183,9 @@ internal sealed class FeedbackRuntime : IDisposable
             while (_running)
             {
                 long now = Stopwatch.GetTimestamp();
-                if (session.SetProcess(processMonitor.GetProcessId(now)))
+                int processId = processMonitor.GetProcessId(now);
+                Volatile.Write(ref _accProcessId, processId);
+                if (session.SetProcess(processId))
                 {
                     _reader.Disconnect();
                     _latest.Publish(default);
@@ -230,6 +251,7 @@ internal sealed class FeedbackRuntime : IDisposable
         var shiftCue = new AccShiftCue();
         var lightsEngine = new RpmLightEngine();
         using var lightMetadata = new AccLightingMetadataReader();
+        using var gyroContext = new AccGyroContextReader();
         RpmLightFrame lights = RpmLightFrame.Off;
         DualSenseHidDevice? device = null;
         FeedbackFrame previous = FeedbackFrame.Off;
@@ -246,7 +268,7 @@ internal sealed class FeedbackRuntime : IDisposable
 
                 if (!_dryRun && device is null && now >= nextReconnect)
                 {
-                    device = DualSenseHidDevice.TryOpenFirst();
+                    device = _inputBridge is null ? null : DualSenseHidDevice.TryOpen(_inputBridge.DeviceInfo);
                     nextReconnect = now + Stopwatch.Frequency;
                     if (device is not null)
                     {
@@ -258,6 +280,9 @@ internal sealed class FeedbackRuntime : IDisposable
 
                 TelemetrySnapshot snapshot = _latest.Read();
                 bool stale = snapshot.ObservedTimestamp == 0 || now - snapshot.ObservedTimestamp > StaleTicks;
+                if (Volatile.Read(ref _accConnected) != 0) gyroContext.Refresh(now);
+                else gyroContext.Disconnect();
+                Volatile.Write(ref _accLive, !stale && gyroContext.IsLive(now) ? 1 : 0);
                 byte originalLarge = _inputBridge?.LargeMotor ?? 0;
                 byte originalSmall = _inputBridge?.SmallMotor ?? 0;
                 FeedbackTuning tuning = _tuningProvider?.Invoke() ?? FeedbackTuning.Neutral;
@@ -278,12 +303,17 @@ internal sealed class FeedbackRuntime : IDisposable
                 {
                     frame = engine.Compute(snapshot, now, originalLarge, originalSmall, tuning, shift);
                 }
+                bool calibration = GyroControlState.Current.SuppressFeedback;
+                if (calibration) frame = FeedbackFrame.Off;
                 if (!stale)
-                    _capture?.TryWrite(snapshot, originalLarge, originalSmall, frame);
+                    _capture?.TryWrite(snapshot, originalLarge, originalSmall, frame, GyroControlState.Current);
                 if (!_dryRun)
                     frame = _startupConfirmation.Apply(frame, now, device is not null,
                         Volatile.Read(ref _accProbeCompleted) != 0,
                         Volatile.Read(ref _accConnected) != 0, !stale, _tuningProvider);
+                // Calibration owns no HID output. It only gates this writer,
+                // including the startup trigger action, for the static sample.
+                if (calibration) frame = FeedbackFrame.Off;
                 Volatile.Write(ref _leftTriggerMode, frame.LeftTrigger.Mode);
                 Volatile.Write(ref _rightTriggerMode, frame.RightTrigger.Mode);
                 // Preserve normal haptic send decisions and the 50 Hz heartbeat.
@@ -291,8 +321,12 @@ internal sealed class FeedbackRuntime : IDisposable
                 // is a normal frame change and releases resistance immediately.
                 bool heartbeatDue = now - lastWriteAt >= Stopwatch.Frequency / 50;
                 if (frame == previous && !heartbeatDue)
+                {
+                    RecordBrakeWrite(now, snapshot, frame, tuning, device, BrakeHidWriteState.Skipped);
                     continue;
+                }
 
+                bool changedFrame = frame != previous;
                 previous = frame;
                 // Evaluate lighting on existing output reports, without adding
                 // HID writes or changing haptic inputs, frame or wake timing.
@@ -304,12 +338,15 @@ internal sealed class FeedbackRuntime : IDisposable
                 }
                 else
                 {
-                    lights = lightsEngine.Compute(snapshot, now, _lightingProvider(), lightMetadata.MaxRpm,
+                    RpmLightSettings effectiveLights = _customPresetProvider() ? _lightingProvider() : RpmLightSettings.Default;
+                    lights = lightsEngine.Compute(snapshot, now, effectiveLights, lightMetadata.MaxRpm,
                         lightMetadata.Context, shift);
                 }
+                if (calibration) lights = RpmLightFrame.Off;
                 if (_dryRun)
                 {
                     Interlocked.Increment(ref _framesWritten);
+                    RecordBrakeWrite(now, snapshot, frame, tuning, device, BrakeHidWriteState.DryRun);
                     continue;
                 }
 
@@ -319,15 +356,19 @@ internal sealed class FeedbackRuntime : IDisposable
                     {
                         Interlocked.Increment(ref _framesWritten);
                         lastWriteAt = now;
+                        RecordBrakeWrite(now, snapshot, frame, tuning, device,
+                            changedFrame ? BrakeHidWriteState.ChangedSuccess : BrakeHidWriteState.HeartbeatSuccess);
                     }
                     else
                     {
+                        RecordBrakeWrite(now, snapshot, frame, tuning, device, BrakeHidWriteState.Failed);
                         _startupConfirmation.Cancel();
                         device.Dispose();
                         device = null;
                         Volatile.Write(ref _dualSenseConnected, 0);
                     }
                 }
+                else RecordBrakeWrite(now, snapshot, frame, tuning, device, BrakeHidWriteState.NoDevice);
             }
         }
         catch (Exception exception)
@@ -339,9 +380,35 @@ internal sealed class FeedbackRuntime : IDisposable
             if (!_dryRun) _startupConfirmation.Cancel();
             // Best effort: never leave an active motor or adaptive-trigger
             // command latched after a normal stop or recoverable thread fault.
-            device?.TryWrite(FeedbackFrame.Off);
+            bool? cleared = device?.TryWrite(FeedbackFrame.Off);
+            RecordBrakeWrite(Stopwatch.GetTimestamp(), default, FeedbackFrame.Off, FeedbackTuning.Neutral, device,
+                cleared == false ? BrakeHidWriteState.Failed : BrakeHidWriteState.Stopped);
             device?.Dispose();
         }
+    }
+
+    private void RecordBrakeWrite(long now, in TelemetrySnapshot telemetry, in FeedbackFrame frame,
+        in FeedbackTuning tuning, DualSenseHidDevice? device, BrakeHidWriteState writeState)
+    {
+        if (_brakeSupportCapture is null) return;
+        bool sameDevice = device is not null && _inputBridge is not null &&
+            string.Equals(device.Info.Path, _inputBridge.DeviceInfo.Path, StringComparison.OrdinalIgnoreCase);
+        BrakeRawInput raw = _inputBridge?.ReadBrakeRawInput(sameDevice) ?? default;
+        // Input can advance while the frame is computed/written. Timestamp the
+        // observation after reading raw input, rather than making it look future-dated.
+        long recordedAt = Math.Max(now, Stopwatch.GetTimestamp());
+        _brakeSupportCapture.Record(new(recordedAt, telemetry, frame, tuning, raw, writeState));
+    }
+
+    private GyroInputContext ReadGyroContext()
+    {
+        long now = Stopwatch.GetTimestamp();
+        TelemetrySnapshot snapshot = _latest.Read();
+        bool fresh = snapshot.ObservedTimestamp != 0 && now - snapshot.ObservedTimestamp <= StaleTicks;
+        bool live = fresh && Volatile.Read(ref _accLive) != 0 && Volatile.Read(ref _accConnected) != 0;
+        return new(_customPresetProvider(), live, !live,
+            AccForegroundWindow.IsForeground(Volatile.Read(ref _accProcessId)), false,
+            GyroButton.None, now / (double)Stopwatch.Frequency);
     }
 
     private void FailBackgroundThread(string threadName, Exception exception)

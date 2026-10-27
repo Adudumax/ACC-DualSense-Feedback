@@ -1,6 +1,9 @@
 using System.Diagnostics;
+using System.Collections.Concurrent;
 using System.Globalization;
+using System.Security.Cryptography;
 using System.Text;
+using ACCDualSenseFeedback.Gyro;
 using ACCDualSenseFeedback.Haptics;
 using ACCDualSenseFeedback.Hardware.DualSense;
 using ACCDualSenseFeedback.Telemetry;
@@ -12,9 +15,19 @@ namespace ACCDualSenseFeedback.Diagnostics;
 internal sealed class TelemetryCsvCapture : IDisposable
 {
     private readonly StreamWriter _writer;
+    private readonly BlockingCollection<CaptureRow> _pending = new(2048);
+    private readonly Thread _writerThread;
     private readonly long _startedAt = Stopwatch.GetTimestamp();
+    private long _lastAcceptedAt;
     private long _lastWrittenAt;
+    private long _droppedRows;
+    private Exception? _writeFailure;
+    private int _disposed;
     private int _rowsSinceFlush;
+    private string _deviceIdentity = "";
+    private string _deviceToken = "";
+
+    public long DroppedRows => Interlocked.Read(ref _droppedRows);
 
     public TelemetryCsvCapture(string path)
     {
@@ -41,18 +54,59 @@ internal sealed class TelemetryCsvCapture : IDisposable
             "left_trigger_mode,left_trigger_p0,left_trigger_p1,left_trigger_p2,left_trigger_p3,left_trigger_p4," +
             "left_trigger_p5,left_trigger_p6,left_trigger_p7,left_trigger_p8,left_trigger_p9," +
             "right_trigger_mode,right_trigger_p0,right_trigger_p1,right_trigger_p2,right_trigger_p3,right_trigger_p4," +
-            "right_trigger_p5,right_trigger_p6,right_trigger_p7,right_trigger_p8,right_trigger_p9");
+            "right_trigger_p5,right_trigger_p6,right_trigger_p7,right_trigger_p8,right_trigger_p9," +
+            "capture_dropped,gyro_state,gyro_source,gyro_angle_deg,gyro_physical_x,gyro_x,gyro_output_x," +
+            "gyro_device_dt_ms,gyro_input_valid,gyro_imu_valid,gyro_factory_calibrated,gyro_stationary_calibrated," +
+            "gyro_needs_recenter,gyro_ready,gyro_calibrating,gyro_calibration_progress,gyro_recenter_sequence,gyro_calibration_sequence," +
+            "gyro_raw_x,gyro_raw_y,gyro_raw_z,accel_raw_x,accel_raw_y,accel_raw_z," +
+            "gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z,accel_g_x,accel_g_y,accel_g_z,gyro_device_token," +
+            "tc_physics_intervention");
+        _writerThread = new Thread(WriteLoop) { IsBackground = true, Name = "Diagnostic CSV writer" };
+        _writerThread.Start();
     }
 
     public void TryWrite(
         in TelemetrySnapshot t,
         byte nativeLarge,
         byte nativeSmall,
-        in FeedbackFrame output)
+        in FeedbackFrame output,
+        GyroRuntimeStatus? gyro = null)
     {
         long now = t.ObservedTimestamp;
-        if (now <= 0 || now <= _lastWrittenAt)
+        if (Volatile.Read(ref _disposed) != 0 || now <= 0 || now <= _lastAcceptedAt)
             return;
+        if (Volatile.Read(ref _writeFailure) is Exception failure)
+            throw new IOException("Telemetry capture could not be written.", failure);
+        _lastAcceptedAt = now;
+        if (!_pending.TryAdd(new CaptureRow(t, nativeLarge, nativeSmall, output,
+                gyro ?? GyroRuntimeStatus.Initial, DroppedRows)))
+            Interlocked.Increment(ref _droppedRows);
+    }
+
+    private void WriteLoop()
+    {
+        try
+        {
+            foreach (CaptureRow captured in _pending.GetConsumingEnumerable())
+                WriteRow(captured);
+        }
+        catch (Exception exception)
+        {
+            Volatile.Write(ref _writeFailure, exception);
+        }
+        finally
+        {
+            try { _writer.Dispose(); }
+            catch (Exception exception) { Interlocked.CompareExchange(ref _writeFailure, exception, null); }
+        }
+    }
+
+    private void WriteRow(in CaptureRow captured)
+    {
+        TelemetrySnapshot t = captured.Telemetry;
+        FeedbackFrame output = captured.Output;
+        GyroRuntimeStatus gyro = captured.Gyro;
+        long now = t.ObservedTimestamp;
         long previousWrittenAt = _lastWrittenAt;
         _lastWrittenAt = now;
 
@@ -103,10 +157,32 @@ internal sealed class TelemetryCsvCapture : IDisposable
         Add(row, t.SlipRatioRl, "F6"); Add(row, t.SlipRatioRr, "F6");
         Add(row, t.SlipAngleFl, "F6"); Add(row, t.SlipAngleFr, "F6");
         Add(row, t.SlipAngleRl, "F6"); Add(row, t.SlipAngleRr, "F6");
-        Add(row, nativeLarge); Add(row, nativeSmall);
+        Add(row, captured.NativeLarge); Add(row, captured.NativeSmall);
         Add(row, output.LeftActuator); Add(row, output.RightActuator);
         AddTrigger(row, output.LeftTrigger);
         AddTrigger(row, output.RightTrigger);
+        Add(row, captured.DroppedRows);
+        row.Append(',').Append(gyro.State).Append(',').Append(gyro.InputSource);
+        Add(row, gyro.AngleDegrees, "F5");
+        Add(row, gyro.PhysicalX, "F6"); Add(row, gyro.GyroX, "F6"); Add(row, gyro.OutputX, "F6");
+        Add(row, gyro.DeviceDeltaSeconds * 1000, "F4");
+        Add(row, gyro.InputValid ? 1 : 0); Add(row, gyro.ImuValid ? 1 : 0);
+        Add(row, gyro.FactoryCalibrated ? 1 : 0); Add(row, gyro.StationaryCalibrated ? 1 : 0);
+        Add(row, gyro.NeedsRecenter ? 1 : 0); Add(row, gyro.Ready ? 1 : 0);
+        Add(row, gyro.IsCalibrating ? 1 : 0); Add(row, gyro.CalibrationProgress, "F4");
+        Add(row, gyro.RecenterSequence); Add(row, gyro.CalibrationSequence);
+        Add(row, gyro.RawGyro.X); Add(row, gyro.RawGyro.Y); Add(row, gyro.RawGyro.Z);
+        Add(row, gyro.RawAcceleration.X); Add(row, gyro.RawAcceleration.Y); Add(row, gyro.RawAcceleration.Z);
+        Add(row, gyro.CalibratedGyro.X, "F6"); Add(row, gyro.CalibratedGyro.Y, "F6"); Add(row, gyro.CalibratedGyro.Z, "F6");
+        Add(row, gyro.AccelerationG.X, "F6"); Add(row, gyro.AccelerationG.Y, "F6"); Add(row, gyro.AccelerationG.Z, "F6");
+        if (gyro.DeviceIdentity != _deviceIdentity)
+        {
+            _deviceIdentity = gyro.DeviceIdentity;
+            _deviceToken = _deviceIdentity.Length == 0 ? "" :
+                Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(_deviceIdentity)))[..12];
+        }
+        row.Append(',').Append(_deviceToken);
+        Add(row, t.TcIntervention, "F4");
         _writer.WriteLine(row);
         if (++_rowsSinceFlush >= 100)
         {
@@ -129,5 +205,14 @@ internal sealed class TelemetryCsvCapture : IDisposable
         Add(row, effect.P5); Add(row, effect.P6); Add(row, effect.P7); Add(row, effect.P8); Add(row, effect.P9);
     }
 
-    public void Dispose() => _writer.Dispose();
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
+        _pending.CompleteAdding();
+        _writerThread.Join();
+        _pending.Dispose();
+    }
+
+    private readonly record struct CaptureRow(TelemetrySnapshot Telemetry, byte NativeLarge,
+        byte NativeSmall, FeedbackFrame Output, GyroRuntimeStatus Gyro, long DroppedRows);
 }
