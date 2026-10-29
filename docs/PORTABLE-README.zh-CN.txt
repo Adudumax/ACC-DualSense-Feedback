@@ -1,4 +1,4 @@
-ACC DualSense Feedback 1.2.0 · 简体中文版
+ACC DualSense Feedback 1.2.1 · 简体中文版
 ========================================
 
 为 Assetto Corsa Competizione 增强 DualSense 震动、自适应扳机反馈，并提供

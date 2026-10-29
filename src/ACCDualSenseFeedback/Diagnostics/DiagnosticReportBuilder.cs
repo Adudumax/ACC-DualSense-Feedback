@@ -158,6 +158,13 @@ internal static partial class DiagnosticReportBuilder
     {
         report.AppendLine();
         report.AppendLine("[DualSense HID probe]");
+        if (DualSenseHidDevice.LastOutputFailure is { } failure)
+        {
+            report.AppendLine($"Last failed output write: {failure.At:O}");
+            report.AppendLine($"Failed output device: PID=0x{failure.ProductId:X4}; transport={failure.Transport}; " +
+                $"device output report={failure.DeviceReportLength}; submitted={failure.SubmittedLength}; " +
+                $"written={failure.BytesWritten}; Win32 error={failure.Win32Error}");
+        }
         try
         {
             List<DualSenseDeviceInfo> devices = DualSenseHidDevice.Enumerate();

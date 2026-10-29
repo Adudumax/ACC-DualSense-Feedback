@@ -5,8 +5,8 @@ namespace ACCDualSenseFeedback.Hardware.DualSense;
 
 internal static class DualSenseReportBuilder
 {
-    // Windows reports 47 payload bytes plus the report ID for the native
-    // DualSense gamepad collection. All fields used here fit within it.
+    // Protocol content, including the report ID. Windows HID collections can
+    // require a larger transfer buffer (for example, 64 bytes on Edge USB).
     public const int UsbReportLength = 48;
     public const int BluetoothReportLength = 78;
     // One merged report owns both compatible vibration and adaptive triggers.
@@ -17,6 +17,25 @@ internal static class DualSenseReportBuilder
     private const byte ValidMergedFeedback = 0x0F;
     private const byte ValidSecondaryFeedback = 0x55;
     private const byte AccurateRumbleMode = 0x06;
+
+    public static int GetOutputReportLength(DualSenseDeviceInfo device)
+        => Math.Max(device.Transport == DualSenseTransport.Bluetooth
+            ? BluetoothReportLength : UsbReportLength, (int)device.OutputReportLength);
+
+    public static int BuildForDevice(in FeedbackFrame frame, DualSenseDeviceInfo device,
+        Span<byte> destination, RpmLightFrame lights = default, bool initializeLights = false)
+    {
+        int length = GetOutputReportLength(device);
+        if (destination.Length < length)
+            throw new ArgumentException($"Destination must contain at least {length} bytes.", nameof(destination));
+
+        int contentLength = Build(frame, device.Transport == DualSenseTransport.Bluetooth,
+            destination, lights, initializeLights);
+        // Win32 WriteFile requires the collection's OutputReportByteLength.
+        // Preserve every protocol byte and zero only the unused transfer tail.
+        destination.Slice(contentLength, length - contentLength).Clear();
+        return length;
+    }
 
     public static int Build(in FeedbackFrame frame, bool bluetooth, Span<byte> destination,
         RpmLightFrame lights = default, bool initializeLights = false)

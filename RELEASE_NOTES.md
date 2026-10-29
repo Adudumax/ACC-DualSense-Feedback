@@ -1,3 +1,18 @@
+# ACC DualSense Feedback 1.2.1
+
+Fixes USB connection and feedback compatibility with DualSense Edge.
+
+## ✅ Fixed
+
+- Corrected USB output report sizing for DualSense Edge, resolving an issue where a connected controller could remain on “Waiting for DualSense” and receive no feedback.
+- Added output-write failure details to diagnostic reports.
+
+Standard DualSense controllers retain their existing output format. Vibration tuning, adaptive-trigger effects, gyro steering, input mapping and lighting logic are unchanged from v1.2.0.
+
+See [release downloads and checksums](docs/RELEASE-v1.2.1.md).
+
+---
+
 # ACC DualSense Feedback 1.2.0
 
 Adds USB gyro steering and clearer traction-control, rear grip-loss and braking feedback.

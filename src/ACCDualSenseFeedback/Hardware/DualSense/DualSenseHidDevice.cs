@@ -23,6 +23,15 @@ internal sealed record DualSenseDeviceInfo(
         System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Path.ToUpperInvariant())))[..16];
 }
 
+internal sealed record DualSenseOutputFailure(
+    ushort ProductId,
+    DualSenseTransport Transport,
+    ushort DeviceReportLength,
+    int SubmittedLength,
+    uint BytesWritten,
+    int Win32Error,
+    DateTimeOffset At);
+
 internal sealed class DualSenseHidDevice : IDisposable
 {
     private const ushort SonyVendorId = 0x054C;
@@ -30,15 +39,18 @@ internal sealed class DualSenseHidDevice : IDisposable
     private const ushort DualSenseEdgeProductId = 0x0DF2;
 
     private readonly SafeFileHandle _handle;
-    private readonly byte[] _reportBuffer = new byte[DualSenseReportBuilder.BluetoothReportLength];
+    private readonly byte[] _reportBuffer;
+    private static DualSenseOutputFailure? _lastOutputFailure;
     private bool _initializeLights = true;
 
     public DualSenseDeviceInfo Info { get; }
+    public static DualSenseOutputFailure? LastOutputFailure => Volatile.Read(ref _lastOutputFailure);
 
     private DualSenseHidDevice(DualSenseDeviceInfo info, SafeFileHandle handle)
     {
         Info = info;
         _handle = handle;
+        _reportBuffer = new byte[DualSenseReportBuilder.GetOutputReportLength(info)];
     }
 
     public static List<DualSenseDeviceInfo> Enumerate()
@@ -159,17 +171,21 @@ internal sealed class DualSenseHidDevice : IDisposable
     {
         try
         {
-            int length = DualSenseReportBuilder.Build(
-                frame,
-                Info.Transport == DualSenseTransport.Bluetooth,
+            int length = DualSenseReportBuilder.BuildForDevice(
+                frame, Info,
                 _reportBuffer, lights, _initializeLights);
-            bool success = NativeMethods.WriteFile(
+            bool accepted = NativeMethods.WriteFile(
                 _handle,
                 _reportBuffer,
                 (uint)length,
                 out uint written,
-                IntPtr.Zero) && written == length;
+                IntPtr.Zero);
+            int error = accepted ? 0 : Marshal.GetLastPInvokeError();
+            bool success = accepted && written == length;
             if (success) _initializeLights = false;
+            else Volatile.Write(ref _lastOutputFailure, new DualSenseOutputFailure(
+                Info.ProductId, Info.Transport, Info.OutputReportLength, length,
+                written, error, DateTimeOffset.Now));
             return success;
         }
         catch (IOException)

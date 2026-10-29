@@ -1,4 +1,4 @@
-ACC DualSense Feedback 1.2.0
+ACC DualSense Feedback 1.2.1
 ===========================
 
 A Windows companion that adds DualSense feedback, adaptive triggers and optional
